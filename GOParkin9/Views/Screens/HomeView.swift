@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct DestinationButton: Identifiable {
     let id: UUID = UUID()
     let name: String
@@ -16,9 +15,9 @@ struct DestinationButton: Identifiable {
 
 struct DestinationView: View {
     let destinations = [
-        DestinationButton(name: "Entry Gate A", icon: "pedestrian.gate.closed"),
-        DestinationButton(name: "Entry Gate B", icon: "car"),
-        DestinationButton(name: "Charging Station", icon: "ev.charger"),
+        DestinationButton(name: "Entry Gate A", icon: "pedestrian.gate.open"),
+        DestinationButton(name: "Exit Gate B", icon: "pedestrian.gate.closed"),
+        DestinationButton(name: "Charging Station", icon: "bolt.car"),
     ]
     
     var body: some View {
@@ -66,7 +65,6 @@ struct DetailRecord: View {
         "3CF9C512-DE75-4C62-B038-553BFBCED56A_1_105_c",
         "BAE36E3B-F571-4CAB-A27D-333964AC4452_1_105_c",
         "4D6A4712-F6CD-4E23-A454-8CF3FD2B12B4_1_105_c",
-        
     ]
     
     var body: some View {
@@ -176,6 +174,56 @@ struct DetailRecord: View {
                     .font(.subheadline)
                     .fontWeight(.bold)
             }
+            
+            Spacer()
+                .frame(height: 20)
+            
+            HStack(spacing: 16) {
+                Button {
+                    print("Navigate")
+                } label: {
+                    HStack {
+                        Image(systemName: "figure.walk")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 15)
+                        
+                        Text("Navigate")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .background(Color.blue)
+                .foregroundStyle(Color.white)
+                .cornerRadius(8)
+                .frame(maxWidth: .infinity)
+                
+                Button {
+                    print("Complete")
+                } label: {
+                    HStack {
+                        Image(systemName: "car")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 15)
+                        
+                        Text("Complete")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .background(Color.green)
+                .foregroundStyle(Color.white)
+                .cornerRadius(8)
+                .frame(maxWidth: .infinity)
+            }
+            
         }
         .fullScreenCover(isPresented: $isPreviewOpen) {
             ImagePreviewView(imageName: images[selectedImageIndex], isPresented: $isPreviewOpen)
@@ -186,40 +234,41 @@ struct DetailRecord: View {
 struct HomeView: View {
     var body: some View {
         VStack {
-            Text("GOParkin9")
-                .font(.title)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("GOParkin9")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    DestinationView()
+                    
+                    DetailRecord()
+                    
+                    Spacer()
+                }
+                .padding()
+                
+            }
+            .frame(maxWidth: .infinity)
             
-            Spacer()
-                .frame(height: 20)
-            
-            DestinationView()
-            
-            Spacer()
-                .frame(height: 40)
-            
-            DetailRecord()
+            Divider()
             
             TabView {
                 Tab("Home", systemImage: "house") {
                     
                 }
                 .badge(2)
-
-
+                
+                
                 Tab("History", systemImage: "clock") {
                     
                 }
                 .badge(5)
             }
-            
-            Spacer()
-            
-            
+            .frame(height: 60)
         }
-        .frame(maxHeight: .infinity)
-        .padding()
+        .ignoresSafeArea(.keyboard)
     }
 }
 
