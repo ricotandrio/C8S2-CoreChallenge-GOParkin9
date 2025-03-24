@@ -17,7 +17,7 @@ struct ContentView: View {
                 case "Home":
                     HomeView()
                 case "History":
-                    tiew()
+                    HistoryView()
                 default:
                     Text("Unknown Tab")
                 }
