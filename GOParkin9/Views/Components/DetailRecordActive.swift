@@ -9,7 +9,9 @@ import SwiftUI
 
 struct DetailRecordActive: View {
     @Binding var isPreviewOpen: Bool
+    @Binding var isCompassOpen: Bool
     @Binding var selectedImageIndex: Int
+    
     
     let images: [String]
     
@@ -38,7 +40,7 @@ struct DetailRecordActive: View {
                     .frame(height: .infinity)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        isPreviewOpen = true
+                        isPreviewOpen.toggle()
                     }
                 
                 Color
@@ -116,7 +118,7 @@ struct DetailRecordActive: View {
         
         HStack(spacing: 16) {
             Button {
-                print("Navigate")
+                isCompassOpen.toggle()
             } label: {
                 HStack {
                     Image(systemName: "figure.walk")

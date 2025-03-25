@@ -10,6 +10,7 @@ import SwiftUI
 struct DetailRecord: View {
     @State private var selectedImageIndex = 0
     @State private var isPreviewOpen = false
+    @State var isCompassOpen = false
     
     let images = [
         "3CF9C512-DE75-4C62-B038-553BFBCED56A_1_105_c",
@@ -17,7 +18,7 @@ struct DetailRecord: View {
         "4D6A4712-F6CD-4E23-A454-8CF3FD2B12B4_1_105_c",
     ]
     
-    let condition = false
+    let condition = true
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -30,6 +31,7 @@ struct DetailRecord: View {
                 if condition {
                     DetailRecordActive(
                         isPreviewOpen: $isPreviewOpen,
+                        isCompassOpen: $isCompassOpen,
                         selectedImageIndex: $selectedImageIndex,
                         images: images
                     )
@@ -39,6 +41,11 @@ struct DetailRecord: View {
             }
             .fullScreenCover(isPresented: $isPreviewOpen) {
                 ImagePreviewView(imageName: images[selectedImageIndex], isPresented: $isPreviewOpen)
+            }
+            .fullScreenCover(isPresented: $isCompassOpen) {
+                CompassView(
+                    isCompassOpen: $isCompassOpen
+                )
             }
         }
     }

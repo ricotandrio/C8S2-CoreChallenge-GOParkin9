@@ -98,6 +98,6 @@ extension NavigationManager {
         // Compute the relative angle so that if phone is pointing north (0°) it equals the bearing.
         let relativeAngle = (bearing - phoneHeading).truncatingRemainder(dividingBy: 360)
         
-        return round(relativeAngle)
+        return relativeAngle
     }
 }
