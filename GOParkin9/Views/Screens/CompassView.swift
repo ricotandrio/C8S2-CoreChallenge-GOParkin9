@@ -14,6 +14,10 @@ struct CompassView: View {
     
     @Binding var isCompassOpen: Bool
     
+    @State var selectedLocation: String = "Vehicle Charging Station"
+    
+    let options = ["Vehicle Charging Station", "Parking Area"]
+    
     var speechUtteranceManager = SpeechUtteranceManager()
     
     let targetDestination = CLLocationCoordinate2D(latitude: -6.2963229765925615, longitude: 106.64088135638036)
@@ -38,14 +42,20 @@ struct CompassView: View {
                     .fontWeight(.bold)
                     .opacity(0.7)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, -10)
                 
-                Text("Vehicle Charging Station")
-                    .font(.title)
-                    .foregroundColor(.white)
-                    .fontWeight(.bold)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                
+                Picker("Select an option", selection: $selectedLocation) {
+                            ForEach(options, id: \.self) { option in
+                                Text(option)
+                                    .font(.title)
+                                    .foregroundColor(.white)
+                                    .fontWeight(.bold)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        }
+                    .pickerStyle(WheelPickerStyle())
+                    .frame(height: 80)
+                    .padding(.leading, -10)
             }
             .padding()
             
@@ -120,4 +130,8 @@ struct CompassView: View {
         .background(Color.green)
         
     }
+}
+
+#Preview {
+    CompassView(isCompassOpen: .constant(true))
 }
