@@ -31,9 +31,9 @@ struct NavigationList: View {
                 HStack {
                     ForEach(navigations) { navigation in
                         VStack {
-                            Button(action: {
+                            Button {
                                 print(navigation.name)
-                            }) {
+                            } label: {
                                 Image(systemName: navigation.icon)
                                     .resizable()
                                     .scaledToFit()
@@ -44,7 +44,7 @@ struct NavigationList: View {
                                     .cornerRadius(8)
                             }
                             .frame(width: 60, height: 60)
-                            
+                                                        
                             Spacer()
                                 .frame(height: 10)
                             
