@@ -100,4 +100,13 @@ extension NavigationManager {
         
         return relativeAngle
     }
+    
+    func distance(to destination: CLLocationCoordinate2D) -> Double {
+        
+        return 0.0
+    }
+    
+//    func getLongitude() -> Double {
+//        return Double(self.location.coordinate.latitude ?? 0.0)
+//    }
 }

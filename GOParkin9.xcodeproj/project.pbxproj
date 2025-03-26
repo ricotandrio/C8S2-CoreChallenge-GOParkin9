@@ -29,9 +29,22 @@
 		5DC0C4AD2D8C1A4000E8987A /* GOParkin9UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GOParkin9UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		12B2ECF12D92FADC00B19E77 /* Exceptions for "GOParkin9" folder in "GOParkin9" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 5DC0C4922D8C1A3F00E8987A /* GOParkin9 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5DC0C4952D8C1A3F00E8987A /* GOParkin9 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				12B2ECF12D92FADC00B19E77 /* Exceptions for "GOParkin9" folder in "GOParkin9" target */,
+			);
 			path = GOParkin9;
 			sourceTree = "<group>";
 		};
@@ -393,13 +406,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"GOParkin9/Preview Content\"";
-				DEVELOPMENT_TEAM = 35PK524L6R;
+				DEVELOPMENT_TEAM = NX68XL6H25;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GOParkin9/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need to take photos to save your parking environment.";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "We need your location even when the app is not in use.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to provide better services.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -412,7 +426,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.GOParkin9.GOParkin9;
+				PRODUCT_BUNDLE_IDENTIFIER = com.GOParkin9.GOParkin91;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -425,13 +439,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"GOParkin9/Preview Content\"";
-				DEVELOPMENT_TEAM = 35PK524L6R;
+				DEVELOPMENT_TEAM = NX68XL6H25;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GOParkin9/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need to take photos to save your parking environment.";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "We need your location even when the app is not in use.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to provide better services.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -444,7 +459,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.GOParkin9.GOParkin9;
+				PRODUCT_BUNDLE_IDENTIFIER = com.GOParkin9.GOParkin91;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

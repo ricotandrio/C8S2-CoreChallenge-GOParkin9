@@ -9,6 +9,8 @@ import SwiftUI
 
 struct DetailRecordInactive: View {
     
+    @State private var showingSheet = false
+    
     var body: some View {
         VStack(alignment: .center) {
             
@@ -33,7 +35,7 @@ struct DetailRecordInactive: View {
             
             Button {
                 print("Park Now")
-                
+                showingSheet.toggle()
             } label: {
                 HStack {
                     Image(systemName: "car")
@@ -50,6 +52,9 @@ struct DetailRecordInactive: View {
                 .foregroundStyle(Color.white)
                 .background(Color.blue)
                 .cornerRadius(8)
+            }
+            .sheet(isPresented: $showingSheet) {
+                ModalView()
             }
         }
     }
