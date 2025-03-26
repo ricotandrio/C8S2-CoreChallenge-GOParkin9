@@ -8,6 +8,12 @@
 import SwiftUI
 import CoreLocation
 
+struct Location: Identifiable {
+    let id = UUID()
+    let name: String
+    let coordinate: CLLocationCoordinate2D
+}
+
 struct CompassView: View {
     @StateObject var navigationManager = NavigationManager()
     @State var isSpeechEnabled = true
@@ -16,15 +22,55 @@ struct CompassView: View {
     
     @State var selectedLocation: String = "Vehicle Charging Station"
     
-    let options = ["Vehicle Charging Station", "Parking Area"]
+    let options = [
+        Location(name: "Vehicle Charging Station", coordinate: CLLocationCoordinate2D(latitude: -16.2963229765925615, longitude: 66.64088135638036)),
+        Location(name: "Parking Area", coordinate: CLLocationCoordinate2D(latitude: -6.2963229765925615, longitude: 106.64088135638036)),
+    ]
     
     var speechUtteranceManager = SpeechUtteranceManager()
     
-    let targetDestination = CLLocationCoordinate2D(latitude: -6.2963229765925615, longitude: 106.64088135638036)
+    var targetDestination: CLLocationCoordinate2D {
+        options.first(where:
+            { $0.name == selectedLocation })?.coordinate ??
+            CLLocationCoordinate2D(latitude: 0, longitude: 0
+        )
+    }
     
     var currentAngle: Double {
         navigationManager.angle(to: targetDestination)
     }
+    
+    var clockDirection: String {
+        switch currentAngle {
+        case 0..<15, 345...360:
+            return "12 o'clock"
+        case 15..<45:
+            return "1 o'clock"
+        case 45..<75:
+            return "2 o'clock"
+        case 75..<105:
+            return "3 o'clock"
+        case 105..<135:
+            return "4 o'clock"
+        case 135..<165:
+            return "5 o'clock"
+        case 165..<195:
+            return "6 o'clock"
+        case 195..<225:
+            return "7 o'clock"
+        case 225..<255:
+            return "8 o'clock"
+        case 255..<285:
+            return "9 o'clock"
+        case 285..<315:
+            return "10 o'clock"
+        case 315..<345:
+            return "11 o'clock"
+        default:
+            return "Unknown direction"
+        }
+    }
+
     
     func speak(_ text: String) {
         if isSpeechEnabled {
@@ -45,17 +91,17 @@ struct CompassView: View {
                     .padding(.bottom, -10)
                 
                 Picker("Select an option", selection: $selectedLocation) {
-                            ForEach(options, id: \.self) { option in
-                                Text(option)
-                                    .font(.title)
-                                    .foregroundColor(.white)
-                                    .fontWeight(.bold)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                        }
-                    .pickerStyle(WheelPickerStyle())
-                    .frame(height: 80)
-                    .padding(.leading, -10)
+                    ForEach(options, id: \.name) { option in
+                        Text(option.name)
+                            .font(.title)
+                            .foregroundColor(.white)
+                            .fontWeight(.bold)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .pickerStyle(WheelPickerStyle())
+                .frame(height: 80)
+                .padding(.leading, -10)
             }
             .padding()
             
@@ -69,20 +115,20 @@ struct CompassView: View {
                 .rotationEffect(.degrees(currentAngle))
                 .animation(.easeInOut(duration: 0.5), value: currentAngle)
                 .onTapGesture {
-                    speak("Turn \(currentAngle) degree")
+                    speak("Turn to the \(clockDirection)")
                 }
             
             Spacer()
             
-            Text("Turn \(currentAngle) degree")
+            Text("Turn to the \(clockDirection)")
                 .font(.headline)
                 .foregroundColor(.white)
                 .fontWeight(.bold)
                 .onTapGesture {
-                    speak("Turn \(currentAngle) degree")
+                    speak("Turn to the \(clockDirection)")
                 }
             
-            Text("300m to Vehicle Charging Station")
+            Text("300m to \(selectedLocation)")
                 .font(.headline)
                 .foregroundColor(.white)
                 .fontWeight(.medium)
