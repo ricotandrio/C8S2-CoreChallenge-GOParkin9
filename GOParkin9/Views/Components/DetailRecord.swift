@@ -18,7 +18,7 @@ struct DetailRecord: View {
         "4D6A4712-F6CD-4E23-A454-8CF3FD2B12B4_1_105_c",
     ]
     
-    let condition = true
+    let condition = false
     
     var body: some View {
         VStack(alignment: .leading) {

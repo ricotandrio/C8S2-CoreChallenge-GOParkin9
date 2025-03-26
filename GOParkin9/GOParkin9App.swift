@@ -13,5 +13,6 @@ struct GOParkin9App: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: [ParkingRecord.self])
     }
 }

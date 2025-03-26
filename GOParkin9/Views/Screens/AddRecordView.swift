@@ -8,76 +8,7 @@
 import SwiftUI
 import CoreLocation
 import CoreLocationUI
-
-//class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
-//    private let manager = CLLocationManager()
-//    
-//    @Published var location: CLLocationCoordinate2D?
-//    @Published var errorMessage: String?
-//
-//    override init() {
-//        super.init()
-//        manager.delegate = self
-//        checkAuthorization() // Periksa izin saat pertama kali aplikasi dibuka
-//        manager.pausesLocationUpdatesAutomatically=false
-//    }
-//
-//    /// Mengecek status izin sebelum meminta lokasi
-//    private func checkAuthorization() {
-//        switch manager.authorizationStatus {
-//        case .notDetermined:
-//            manager.requestWhenInUseAuthorization() // Munculkan request izin
-//        case .restricted, .denied:
-//            DispatchQueue.main.async {
-//                self.errorMessage = "Location access denied. Please enable it in settings."
-//            }
-//        case .authorizedWhenInUse, .authorizedAlways:
-//            requestLocation() // Jika sudah diizinkan, langsung minta lokasi
-//        @unknown default:
-//            DispatchQueue.main.async {
-//                self.errorMessage = "Unknown location authorization status."
-//            }
-//        }
-//    }
-//
-//    /// Meminta lokasi hanya jika layanan lokasi aktif
-//    func requestLocation() {
-//        if CLLocationManager.locationServicesEnabled() {
-//            if manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways {
-//                manager.requestLocation()
-//            } else {
-//                checkAuthorization() // Pastikan izin sudah diberikan
-//            }
-//        } else {
-//            DispatchQueue.main.async {
-//                self.errorMessage = "Location services are disabled."
-//            }
-//        }
-//    }
-//
-//    /// Delegate method untuk menangani perubahan izin
-//    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-//        checkAuthorization() // Periksa kembali izin setelah berubah
-//    }
-//
-//    /// Delegate method untuk menerima lokasi terbaru
-//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        guard let latestLocation = locations.last else { return }
-//        if let coordinate = locations.first?.coordinate {
-//            DispatchQueue.main.async {
-//                self.location = latestLocation.coordinate
-//                self.errorMessage = nil
-//            }
-//        }
-//    }
-//
-//    /// Delegate method untuk menangani error
-//    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-//        DispatchQueue.main.async {
-//            self.errorMessage = "Failed to get location: \(error.localizedDescription)"
-//        }
-//    }
-//}
+import SwiftData
 
 struct FullscreenImageView: View {
     var imageName: UIImage
@@ -98,15 +29,38 @@ struct FullscreenImageView: View {
 
 struct ModalView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var showingAlert = false
-    @State private var showingAddButton = false
+    @State var showingAlert = false
+    @State var showingAddButton = false
     let locationManager = NavigationManager()
-    @State private var savedLocation: CLLocationCoordinate2D?
-    @State private var selectedImage: UIImage?
-    @State private var isImageFullscreen = false
-    @State private var showingCamera = false
-    @State private var images: [UIImage] = []
-    @State private var newImage: UIImage? = nil
+    @State var savedLocation: CLLocationCoordinate2D?
+    @State var selectedImage: UIImage?
+    @State var isImageFullscreen = false
+    @State var showingCamera = false
+    @State var images: [UIImage] = []
+    @State var newImage: UIImage? = nil
+    
+    @Environment(\.modelContext) var context
+    
+    func addParkingRecord(latitude: Double, longitude: Double, images: [UIImage]) {
+        let convertedImages = images.map { ParkingImage(image: $0) }
+        
+        let record = ParkingRecord(
+            latitude: latitude,
+            longitude: longitude,
+            images: convertedImages
+        )
+        
+        context.insert(record)
+        
+        do {
+            try context.save()
+            print("Record added successfully!")
+        } catch {
+            print("Failed to save record: \(error)")
+        }
+    }
+    
+    @Query var parkingRecords: [ParkingRecord]
     
     var body: some View {
         
@@ -116,10 +70,28 @@ struct ModalView: View {
                     dismiss()
                 }
                 Spacer()
-                Button("Done") { }
+                Button {
+                    if let location = savedLocation {
+                        print("button clicked")
+                        addParkingRecord(
+                            latitude: location.latitude,
+                            longitude: location.longitude,
+                            images: images
+                        )
+                    }
+                } label: {
+                    Text("Done")
+                }
             }
             .padding()
             
+            
+            List(parkingRecords) { record in
+                Text("imaegs: \(String(describing: record.images))")
+                Text("latitude \(record.longitude)")
+                Text("longitude \(record.latitude)")
+            }
+                
             
             Text("Add up to 8 photos or videos of your parking area environment")
                 .padding()
@@ -226,4 +198,3 @@ struct ModalView: View {
 //        }
     }
 }
-
