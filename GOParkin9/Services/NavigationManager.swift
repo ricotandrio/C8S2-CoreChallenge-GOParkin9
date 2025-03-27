@@ -63,14 +63,14 @@ class NavigationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         DispatchQueue.main.async {
             self.location = latestLocation
             self.isUpdating = false
-            print("Updated location: \(latestLocation.coordinate.latitude), \(latestLocation.coordinate.longitude)")
+//            print("Updated location: \(latestLocation.coordinate.latitude), \(latestLocation.coordinate.longitude)")
         }
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         DispatchQueue.main.async {
             self.heading = newHeading
-            print("Heading: \(newHeading.magneticHeading), \(newHeading.trueHeading)")
+//            print("Heading: \(newHeading.magneticHeading), \(newHeading.trueHeading)")
         }
     }
 }

@@ -11,51 +11,65 @@ struct DetailRecordActive: View {
     @Binding var isPreviewOpen: Bool
     @Binding var isCompassOpen: Bool
     @Binding var selectedImageIndex: Int
+    @State var dateTime: Date
     
+    @State var images: [String]
     
-    let images: [String]
+    @State var parkingRecord: ParkingRecord
     
     var body: some View {
-        ZStack {
-            Image(images[selectedImageIndex])
-                .resizable()
-                .scaledToFill()
-                .frame(maxHeight: 200)
-                .animation(.easeInOut, value: selectedImageIndex)
-                .clipped()
+//        Text(String(describing: parkingRecord.images))
+        
+        if parkingRecord.images.isEmpty {
+            Text("There's no image")
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical)
+                .foregroundStyle(Color.red)
+                .fontWeight(.bold)
             
-            HStack{
-                Color
-                    .clear
-                    .frame(width: UIScreen.main.bounds.width / 3, height: .infinity)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        withAnimation {
-                            selectedImageIndex = (selectedImageIndex - 1) == -1 ? images.count - 1 : selectedImageIndex - 1
-                        }
-                    }
+        } else {
+            ZStack {
+                Image(uiImage: parkingRecord.images[selectedImageIndex].getImage())
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxHeight: 200)
+                    .animation(.easeInOut, value: selectedImageIndex)
+                    .clipped()
                 
-                Color
-                    .clear
-                    .frame(height: .infinity)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        isPreviewOpen.toggle()
-                    }
-                
-                Color
-                    .clear
-                    .frame(width: UIScreen.main.bounds.width / 3, height: .infinity)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        withAnimation {
-                            selectedImageIndex = (selectedImageIndex + 1) % images.count
+                HStack{
+                    Color
+                        .clear
+                        .frame(width: UIScreen.main.bounds.width / 3, height: .infinity)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation {
+                                selectedImageIndex = (selectedImageIndex - 1) == -1 ? parkingRecord.images.count - 1 : selectedImageIndex - 1
+                            }
                         }
-                    }
+                    
+                    Color
+                        .clear
+                        .frame(height: .infinity)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            isPreviewOpen.toggle()
+                        }
+                    
+                    Color
+                        .clear
+                        .frame(width: UIScreen.main.bounds.width / 3, height: .infinity)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation {
+                                selectedImageIndex = (selectedImageIndex + 1) % parkingRecord.images.count
+                            }
+                        }
+                }
             }
         }
+        
         HStack {
-            ForEach(0..<images.count, id: \.self) { index in
+            ForEach(0..<parkingRecord.images.count, id: \.self) { index in
                 Circle()
                     .frame(width: 10, height: 10)
                     .foregroundColor(index == selectedImageIndex ? .blue : .gray.opacity(0.6))
@@ -63,6 +77,8 @@ struct DetailRecordActive: View {
                         selectedImageIndex = index
                     }
             }
+            
+            
         }
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(.top, 8)
@@ -85,7 +101,7 @@ struct DetailRecordActive: View {
                 
             }
             
-            Text("25 Dec 2024 at 12:00 p.m.")
+            Text(dateTime, format: .dateTime.day().month().year())
                 .font(.subheadline)
                 .fontWeight(.bold)
         }
@@ -108,7 +124,7 @@ struct DetailRecordActive: View {
                 
             }
             
-            Text("(87.2321, 123.1231)")
+            Text("GOP 9")
                 .font(.subheadline)
                 .fontWeight(.bold)
         }
@@ -140,6 +156,7 @@ struct DetailRecordActive: View {
             .frame(maxWidth: .infinity)
             
             Button {
+                parkingRecord.isHistory.toggle()
                 print("Complete")
             } label: {
                 HStack {

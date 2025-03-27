@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct ImagePreviewView: View {
-    let imageName: String
+    let imageName: UIImage
     @Binding var isPresented: Bool
     
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
             
-            Image(imageName)
+            Image(uiImage: imageName)
                 .resizable()
                 .scaledToFit()
                 .onTapGesture {

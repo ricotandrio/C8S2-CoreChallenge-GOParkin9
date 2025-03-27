@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DetailRecord: View {
     @State private var selectedImageIndex = 0
@@ -17,30 +18,61 @@ struct DetailRecord: View {
         "BAE36E3B-F571-4CAB-A27D-333964AC4452_1_105_c",
         "4D6A4712-F6CD-4E23-A454-8CF3FD2B12B4_1_105_c",
     ]
+ 
+    @Query(filter: #Predicate<ParkingRecord>{p in p.isHistory == false}) var parkingRecords: [ParkingRecord]
     
-    let condition = false
+    var firstParkingRecord: ParkingRecord? {
+        parkingRecords.first
+    }
+
+    @Query var parkingRecordss: [ParkingRecord]
+//    @State var condition = true
     
     var body: some View {
         VStack(alignment: .leading) {
-            Section(header: Text("Detail Record")
-                .font(.title3)
-                .fontWeight(.bold)
-                .opacity(0.6)
-            ) {
+            Section {
+//                Text(String(describing: parkingRecordss))
                 
-                if condition {
+                if let record = firstParkingRecord {
                     DetailRecordActive(
                         isPreviewOpen: $isPreviewOpen,
                         isCompassOpen: $isCompassOpen,
                         selectedImageIndex: $selectedImageIndex,
-                        images: images
+                        dateTime: record.createdAt,
+                        images: images,
+                        parkingRecord: record
+                        
                     )
                 } else {
                     DetailRecordInactive()
                 }
+//                if !parkingRecords.isEmpty {
+//                    ForEach(parkingRecords) { parkingRecord in
+//                        if !parkingRecord.isHistory {
+//                            DetailRecordActive(
+//                                isPreviewOpen: $isPreviewOpen,
+//                                isCompassOpen: $isCompassOpen,
+//                                selectedImageIndex: $selectedImageIndex,
+//                                dateTime: parkingRecord.createdAt,
+//                                images: images,
+//                                parkingRecord: parkingRecord
+//                                
+//                            )
+//                        }
+//                    }
+//                } else {
+//                    DetailRecordInactive()
+//                }
+            } header: {
+                Text("Detail Record")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .opacity(0.6)
             }
             .fullScreenCover(isPresented: $isPreviewOpen) {
-                ImagePreviewView(imageName: images[selectedImageIndex], isPresented: $isPreviewOpen)
+                if let image = firstParkingRecord?.images[selectedImageIndex].getImage() {
+                    ImagePreviewView(imageName: image, isPresented: $isPreviewOpen)
+                }
             }
             .fullScreenCover(isPresented: $isCompassOpen) {
                 CompassView(
@@ -49,4 +81,8 @@ struct DetailRecord: View {
             }
         }
     }
+}
+
+#Preview {
+    DetailRecord()
 }

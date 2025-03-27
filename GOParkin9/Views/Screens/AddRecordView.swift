@@ -4,24 +4,23 @@
 //
 //  Created by Regina Celine Adiwinata on 24/03/25.
 //
-
 import SwiftUI
 import CoreLocation
 import CoreLocationUI
 import SwiftData
 
 struct FullscreenImageView: View {
-    var imageName: UIImage
+    var image: UIImage
     @Binding var isPresented: Bool
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            Image(uiImage: imageName)
+            Image(uiImage: image)
                 .resizable()
                 .scaledToFit()
                 .onTapGesture {
-                    isPresented = false // Tutup fullscreen saat diklik
+                    isPresented = false
                 }
         }
     }
@@ -29,24 +28,28 @@ struct FullscreenImageView: View {
 
 struct ModalView: View {
     @Environment(\.dismiss) var dismiss
-    @State var showingAlert = false
-    @State var showingAddButton = false
+    @State private var showingAlert = false
+    @State private var showingCamera = false
+    @State private var isImageFullscreen = false
+    @State private var selectedImage: UIImage?
+    @State private var selectedFloor = "Basement 1"
+    @State private var floors = ["Basement 1", "Basement 2"]
+    let dateTime = Date.now
+
     let locationManager = NavigationManager()
-    @State var savedLocation: CLLocationCoordinate2D?
-    @State var selectedImage: UIImage?
-    @State var isImageFullscreen = false
-    @State var showingCamera = false
-    @State var images: [UIImage] = []
-    @State var newImage: UIImage? = nil
+    @State private var savedLocation: CLLocationCoordinate2D?
     
     @Environment(\.modelContext) var context
-    
+
     func addParkingRecord(latitude: Double, longitude: Double, images: [UIImage]) {
         let convertedImages = images.map { ParkingImage(image: $0) }
         
         let record = ParkingRecord(
             latitude: latitude,
             longitude: longitude,
+            isHistory: false,
+            floor: selectedFloor,
+            createdAt: dateTime,
             images: convertedImages
         )
         
@@ -59,12 +62,13 @@ struct ModalView: View {
             print("Failed to save record: \(error)")
         }
     }
-    
+
     @Query var parkingRecords: [ParkingRecord]
     
+    @State private var images: [UIImage] = [] // State untuk menyimpan gambar
+
     var body: some View {
-        
-        VStack {
+        VStack(alignment: .leading) {
             HStack {
                 Button("Dismiss") {
                     dismiss()
@@ -72,115 +76,81 @@ struct ModalView: View {
                 Spacer()
                 Button {
                     if let location = savedLocation {
-                        print("button clicked")
+                        print("Button clicked")
                         addParkingRecord(
                             latitude: location.latitude,
                             longitude: location.longitude,
                             images: images
                         )
                     }
+                    dismiss()
                 } label: {
                     Text("Done")
                 }
             }
             .padding()
             
-            
-            List(parkingRecords) { record in
-                Text("imaegs: \(String(describing: record.images))")
-                Text("latitude \(record.longitude)")
-                Text("longitude \(record.latitude)")
+            if(images.isEmpty) {
+                Text("Add up to 8 photos or videos of your parking area environment")
+                    .padding()
             }
-                
             
-            Text("Add up to 8 photos or videos of your parking area environment")
-                .padding()
             
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
-                ForEach(images.indices, id: \.self) { index in
-                    Image(uiImage: images[index])
-                        .resizable()
-                        .scaledToFill()
-                        .aspectRatio(1, contentMode: .fit) // Memastikan rasio 1:1
-                        .frame(width: 80, height: 80) // Mengisi lebar sel
-                        .clipped() // Memotong bagian luar gambar agar pas
-                        .onTapGesture {
-                            selectedImage = images[index]
-                            isImageFullscreen = true
-                        }
-                        .overlay(
-                            Button(action: {
-                                images.remove(at: index)
-                            }) {
-                                RoundedRectangle(cornerRadius: 30)
-                                    .frame(width: 20, height: 20)
-                                    .foregroundColor(Color.red)
-                                    .overlay(
-                                        Text("x").foregroundColor(.white)
-                                    )
-                                
-                            }
-                                .offset(x:-35,y:-35)
-                            
-                        )
-                }
-                
-                if images.count < 8 {
-                    Button(action:{
-                        showingCamera.toggle()
-                    }) {
-                        Rectangle()
-                            .frame(width: 80, height: 80)
-                            .foregroundColor(Color.gray.opacity(0.5))
-                            .overlay(
-                                Text("+").foregroundColor(.blue)
-                            )
-                    }
-                    .fullScreenCover(isPresented: $showingCamera) {
-                        CameraView(image: $newImage)
-                    }
-//                    if newImage != nil {
-//                        images.append(newImage)
-//                        newImage = nil
-//                    }
-                    .onChange(of: newImage) { newValue in
-                        if let newImage = newValue {
-                            images.append(newImage)
-                            self.newImage = nil
-                        }
-                    }
-                }
-            }
-            .padding()
-            
-            VStack {
-                if let location = savedLocation {
-                    Text("Location: \(String(describing: locationManager.location))")
+            GridView(images: $images, isImageFullscreen: $isImageFullscreen, selectedImage: $selectedImage)
+            Grid(alignment: .leading) {
+                GridRow {
+                    HStack {
+                        Image(systemName: "calendar")
+                        Text(dateTime, format: .dateTime.day().month().year())
+                    }.frame(maxWidth: .infinity, alignment: .leading)
                     
-                    Text("Latitude: \(locationManager.location?.coordinate.latitude)")
+                    HStack {
+                        Image(systemName: "clock")
+                        Text(dateTime, format: .dateTime.hour().minute())
+                    }.frame(maxWidth: .infinity, alignment: .trailing)
+                }
+            }.padding().frame(maxWidth: .infinity)
+            HStack {
+                Image(systemName: "stairs")
+                Picker("Floor", selection: $selectedFloor) {
+                    ForEach(floors, id: \.self) { floor in
+                        Text(floor)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }.padding()
+            
+
+            VStack(alignment: .leading){
+                if let location = savedLocation {
+                    Text("Location Saved!")
+                    Text("Latitude: \(location.latitude), Longitude: \(location.longitude)")
                 } else {
                     Text("Press the button to get your location.")
                         .padding()
-                }
-                
-                if savedLocation == nil {
                     Button("Save my parking location") {
                         showingAlert = true
                     }
                     .padding()
+                    .frame(maxWidth: .infinity)
+//                    .buttonStyle(.borderedProminent)
                     .background(Color.blue)
                     .foregroundColor(.white)
-                    .alert("Important message", isPresented: $showingAlert) {
+                    .cornerRadius(8)
+                    .alert("Save Location", isPresented: $showingAlert) {
                         Button("Save") {
                             savedLocation = locationManager.location?.coordinate
                         }
                         Button("Cancel", role: .cancel) {}
                     } message: {
-                        Text("Once you save the location you can't change it until it's complete")
+                        Text("Once you save the location, you can't change it until it's complete.")
                     }
-//                    .frame(height: 50)
-                    .padding()
                 }
+                
+//                if savedLocation == nil {
+//
+//                    
+//                }
                 Spacer()
             }.padding()
             
@@ -188,13 +158,71 @@ struct ModalView: View {
         }
         .sheet(isPresented: $isImageFullscreen) {
             if let selectedImage = selectedImage {
-                FullscreenImageView(imageName: selectedImage, isPresented: $isImageFullscreen)
+                FullscreenImageView(image: selectedImage, isPresented: $isImageFullscreen)
             }
         }
-//        .onReceive(locationManager.$location) { newLocation in
-//            if let newLocation = newLocation {
-//                savedLocation = newLocation.coordinate // Simpan lokasi saat didapatkan
-//            }
-//        }
+    }
+}
+
+struct GridView: View {
+    @Binding var images: [UIImage]
+    @Binding var isImageFullscreen: Bool
+    @Binding var selectedImage: UIImage?
+    
+    @State private var showingCamera = false
+    @State private var newImage: UIImage?
+
+    var body: some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
+            ForEach(images.indices, id: \.self) { img in
+                Image(uiImage: images[img])
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 80, height: 80)
+                    .clipped()
+                    .cornerRadius(8)
+                    .onTapGesture {
+                        selectedImage = images[img]
+                        isImageFullscreen = true
+                    }
+                    .overlay(
+                        Button(action: {
+                            images.remove(at: img)
+                        }) {
+                            RoundedRectangle(cornerRadius: 30)
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(Color.red)
+                                .overlay(
+                                    Text("x").foregroundColor(.white)
+                                )
+                        }
+                        .offset(x: -35, y: -35)
+                    )
+            }
+            
+            if images.count < 8 {
+                Button(action: {
+                    showingCamera.toggle()
+                }) {
+                    Rectangle()
+                        .frame(width: 80, height: 80)
+                        .foregroundColor(Color.gray.opacity(0.5))
+                        .cornerRadius(8)
+                        .overlay(
+                            Text("+").foregroundColor(.blue)
+                        )
+                }
+                .fullScreenCover(isPresented: $showingCamera) {
+                    CameraView(image: $newImage)
+                }
+                .onChange(of: newImage) { newValue in
+                    if let newImage = newValue {
+                        images.append(newImage)
+                        self.newImage = nil
+                    }
+                }
+            }
+        }
+        .padding()
     }
 }
