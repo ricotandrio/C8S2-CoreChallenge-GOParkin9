@@ -12,7 +12,7 @@ import SwiftUI
 @Model
 class ParkingImage {
     @Attribute(.externalStorage) var image: Data
-    
+     
     init(image: UIImage) {
         self.image = image.jpegData(compressionQuality: 0.8) ?? Data()
     }
