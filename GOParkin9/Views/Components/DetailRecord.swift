@@ -21,12 +21,12 @@ struct DetailRecord: View {
  
     @Query(filter: #Predicate<ParkingRecord>{p in p.isHistory == false}) var parkingRecords: [ParkingRecord]
     
+
     var firstParkingRecord: ParkingRecord? {
         parkingRecords.first
     }
 
     @Query var parkingRecordss: [ParkingRecord]
-//    @State var condition = true
     
     var body: some View {
         VStack(alignment: .leading) {
