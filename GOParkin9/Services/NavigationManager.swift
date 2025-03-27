@@ -96,7 +96,7 @@ extension NavigationManager {
         let phoneHeading = self.locationManager.heading?.magneticHeading ?? 0
         
         // Compute the relative angle so that if phone is pointing north (0°) it equals the bearing.
-        let relativeAngle = (bearing - phoneHeading).truncatingRemainder(dividingBy: 360)
+        let relativeAngle = (bearing - phoneHeading + 360).truncatingRemainder(dividingBy: 360)
         
         return relativeAngle
     }

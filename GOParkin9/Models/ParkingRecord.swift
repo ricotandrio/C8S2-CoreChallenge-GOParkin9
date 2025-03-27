@@ -7,13 +7,29 @@
 
 import Foundation
 import SwiftData
+import CoreLocation
 
 @Model
-class ParkingRecord {
+class ParkingRecord: Identifiable {
     var id: UUID = UUID()
+    var latitude: Double
+    var longitude: Double
+    var isHistory: Bool
+    var isPinned: Bool
+    var createdAt: Date
     
-    init () {
-        
+    @Relationship(deleteRule: .cascade) var images: [ParkingImage] = []
+    
+    init (
+        latitude: Double,
+        longitude: Double,
+        images: [ParkingImage]
+    ) {
+        self.latitude = latitude
+        self.longitude = longitude
+        self.isHistory = false
+        self.isPinned = false
+        self.createdAt = Date()
+        self.images = images
     }
-    
 }
