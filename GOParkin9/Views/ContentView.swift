@@ -22,7 +22,6 @@ struct ContentView: View {
                    .tabItem {
                        Label("History", systemImage: "clock")
                    }
-                   .badge(2)
             }
         }
         .ignoresSafeArea(.keyboard)

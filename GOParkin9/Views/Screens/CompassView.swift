@@ -20,19 +20,24 @@ struct CompassView: View {
     
     @Binding var isCompassOpen: Bool
     
-    @State var selectedLocation: String = "Vehicle Charging Station"
+    @State var selectedLocation: String
+    @State var longitude: Double
+    @State var latitude: Double
     
-    let options = [
-        Location(name: "Vehicle Charging Station", coordinate: CLLocationCoordinate2D(latitude: -16.2963229765925615, longitude: 66.64088135638036)),
-        Location(name: "Parking Area", coordinate: CLLocationCoordinate2D(latitude: -6.2963229765925615, longitude: 106.64088135638036)),
+    @State var options = [
+        Location(name: "Entry Gate", coordinate: CLLocationCoordinate2D(latitude: -6.2963229765925615, longitude: 106.64088135638036)),
+        Location(name: "Exit Gate", coordinate: CLLocationCoordinate2D(latitude: -6.2963229765925615, longitude: 106.64088135638036)),
+        Location(name: "Charging Station", coordinate: CLLocationCoordinate2D(latitude: -16.2963229765925615, longitude: 66.64088135638036))
     ]
+    
+
     
     var speechUtteranceManager = SpeechUtteranceManager()
     
     var targetDestination: CLLocationCoordinate2D {
         options.first(where:
             { $0.name == selectedLocation })?.coordinate ??
-            CLLocationCoordinate2D(latitude: 0, longitude: 0
+        CLLocationCoordinate2D(latitude: 0, longitude: 0
         )
     }
     
@@ -79,7 +84,23 @@ struct CompassView: View {
         }
     }
     
+    func appendLocation() {
+        if selectedLocation=="Parking Location" {
+            options.append(Location(name: selectedLocation, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)))
+        }
+    }
+    
+    var formattedDistance: String {
+        let distance = navigationManager.distance(to: targetDestination)
+        if distance > 999 {
+            return String(format: "%.2f km", distance / 1000)
+        } else {
+            return "\(Int(distance)) m"
+        }
+    }
+    
     var body: some View {
+        
         VStack {
             VStack {
                 Text("NAVIGATE TO")
@@ -102,6 +123,7 @@ struct CompassView: View {
                 .pickerStyle(WheelPickerStyle())
                 .frame(height: 80)
                 .padding(.leading, -10)
+//                Text("\(option)")
             }
             .padding()
             
@@ -128,7 +150,7 @@ struct CompassView: View {
                     speak("Turn to the \(clockDirection)")
                 }
             
-            Text("300m to \(selectedLocation)")
+            Text("\(formattedDistance) to \(selectedLocation)")
                 .font(.headline)
                 .foregroundColor(.white)
                 .fontWeight(.medium)
@@ -174,10 +196,8 @@ struct CompassView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.green)
-        
+        .onAppear {
+            appendLocation()
+        }
     }
-}
-
-#Preview {
-    CompassView(isCompassOpen: .constant(true))
 }

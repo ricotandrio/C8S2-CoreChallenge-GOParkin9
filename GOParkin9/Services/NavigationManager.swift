@@ -102,8 +102,24 @@ extension NavigationManager {
     }
     
     func distance(to destination: CLLocationCoordinate2D) -> Double {
+        guard let from = self.location?.coordinate else { return 0.0 }
+//        print(from)
+                
+        let lat1 = from.latitude.toRadians()
+        let lon1 = from.longitude.toRadians()
+        let lat2 = destination.latitude.toRadians()
+        let lon2 = destination.longitude.toRadians()
         
-        return 0.0
+        let dLat = lat2 - lat1
+        let dLon = lon2 - lon1
+        
+        let a = sin(dLat / 2) * sin(dLat / 2) +
+                cos(lat1) * cos(lat2) *
+                sin(dLon / 2) * sin(dLon / 2)
+        let c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        
+        let earthRadius = 6371.0 // Radius bumi dalam kilometer
+        return earthRadius * c * 1000 // Jarak dalam meter
     }
     
 //    func getLongitude() -> Double {
