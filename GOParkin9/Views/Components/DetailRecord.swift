@@ -11,12 +11,9 @@ import SwiftData
 struct DetailRecord: View {
     @State private var selectedImageIndex = 0
     @State private var isPreviewOpen = false
-    @State var isCompassOpen = false
+    @Binding var isCompassOpen: Bool
     
-
- 
     @Query(filter: #Predicate<ParkingRecord>{p in p.isHistory == false}) var parkingRecords: [ParkingRecord]
-    
 
     var firstParkingRecord: ParkingRecord? {
         parkingRecords.first
@@ -68,5 +65,5 @@ struct DetailRecord: View {
 }
 
 #Preview {
-    DetailRecord()
+    ContentView()
 }

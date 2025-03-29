@@ -197,6 +197,7 @@ struct CompassView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.green)
         .onAppear {
+            print(selectedLocation)
             appendLocation()
         }
     }
