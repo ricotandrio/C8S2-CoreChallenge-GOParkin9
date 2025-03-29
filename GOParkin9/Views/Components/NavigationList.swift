@@ -14,7 +14,7 @@ struct NavigationButton: Identifiable {
 }
 
 struct NavigationList: View {
-    @Binding var isCompassOpen: Bool
+    @State var isCompassOpen: Bool = false
     
     @State var selectedNavigationName = ""
     

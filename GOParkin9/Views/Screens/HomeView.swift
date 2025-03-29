@@ -8,17 +8,16 @@
 import SwiftUI
 
 struct HomeView: View {
-    @State private var isCompassOpen: Bool = false
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     NavigationList(
-                        isCompassOpen: $isCompassOpen
+//                        isCompassOpen: $isCompassOpen
                     )
 
                     DetailRecord(
-                        isCompassOpen: $isCompassOpen
+//                        isCompassOpen: $isCompassOpen
                     )
                 }
                 .navigationTitle("GOParkin9")
