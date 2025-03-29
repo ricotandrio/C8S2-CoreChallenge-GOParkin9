@@ -8,13 +8,19 @@
 import SwiftUI
 
 struct HomeView: View {
+    @State private var isCompassOpen: Bool = false
+    
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    NavigationList()
+                    NavigationList(
+                        isCompassOpen: $isCompassOpen
+                    )
                     
-                    DetailRecord()
+                    DetailRecord(
+                        isCompassOpen: $isCompassOpen
+                    )
                 }
                 .navigationTitle("GOParkin9")
                 .padding()
@@ -24,5 +30,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
+    ContentView()
 }
