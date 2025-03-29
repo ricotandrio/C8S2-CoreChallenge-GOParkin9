@@ -13,11 +13,16 @@ import SwiftData
 struct HistoryView: View {
     @AppStorage("deleteHistoryAfterInDay") var deleteHistoryAfterInDay: Int = 5
 
+    @Environment(\.modelContext) var context
+
+    // This variable belongs to sort the history feature
     @State private var isReverse = false
     
+    // This variable belongs to the select to delete feature
     @State private var isSelecting = false
     @State private var selectedParkingRecords: Set<UUID> = []
     
+    // This variable used to fetch all history data
     @Query(
         filter: #Predicate<ParkingRecord> { p in p.isHistory == true },
         sort: [SortDescriptor(\.createdAt)]
@@ -36,9 +41,6 @@ struct HistoryView: View {
     var pinnedParkingRecords: [ParkingRecord] {
         sortedParkingRecords.filter { $0.isPinned }
     }
-
-    @Environment(\.modelContext) var context
-
     
     var body: some View {
         NavigationView {
@@ -106,6 +108,7 @@ struct HistoryView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
+                        // Button for sort the history by date
                         Button {
                             isReverse.toggle()
                         } label: {
@@ -115,6 +118,7 @@ struct HistoryView: View {
                             Image(systemName: "arrow.up.arrow.down")
                         }
                         
+                        // Button for delete the history after certain days
                         Button {
                             configureDeleteHistoryAfterInDay()
                         } label: {
@@ -124,6 +128,7 @@ struct HistoryView: View {
                             Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
                         }
                         
+                        // Button for cancel the selection
                         Button {
                             cancelSelection()
                         } label: {
@@ -133,6 +138,7 @@ struct HistoryView: View {
                             Image(systemName: isSelecting ? "checkmark.circle" : "checkmark.circle.fill")
                         }
                         
+                        // Button for delete the selected history only if the selection is active
                         if isSelecting && !selectedParkingRecords.isEmpty {
                             Button {
                                 deleteSelection()
@@ -150,6 +156,7 @@ struct HistoryView: View {
             }
         }
         .onAppear {
+            // This responsible for delete the history after certain days
             let calendar = Calendar.current
             let expirationDate = calendar.date(byAdding: .day, value: -deleteHistoryAfterInDay, to: Date()) ?? Date()
 
@@ -163,6 +170,7 @@ struct HistoryView: View {
         }
     }
     
+    // This function belongs to button for delete the history after certain days
     private func configureDeleteHistoryAfterInDay() {
         switch deleteHistoryAfterInDay {
         case 5:
@@ -176,11 +184,13 @@ struct HistoryView: View {
         }
     }
     
+    // This function belongs to button for cancel the selection
     private func cancelSelection() {
         selectedParkingRecords.removeAll()
         isSelecting.toggle()
     }
     
+    // This function belongs to button for delete the selected history only if the selection is active
     private func deleteSelection() {
         selectedParkingRecords.forEach { id in
             if let entry = allParkingRecords.first(where: { $0.id == id }) {
@@ -191,6 +201,7 @@ struct HistoryView: View {
         isSelecting.toggle()
     }
     
+    // This function belongs to button for check the selected history
     private func toggleSelection(_ entry: ParkingRecord) {
         withAnimation {
             print(entry)
@@ -204,6 +215,7 @@ struct HistoryView: View {
         }
     }
 
+    // This function belongs to pin button that can be accessed by swipe history
     private func pinItem(_ entry: ParkingRecord) {
         withAnimation {
             
@@ -212,6 +224,7 @@ struct HistoryView: View {
         }
     }
     
+    // This function belongs to delete button that can be accessed by swipe history
     private func deleteItem(_ entry: ParkingRecord) {
         withAnimation {
             context.delete(entry)
