@@ -12,13 +12,9 @@ struct HomeView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    NavigationList(
-//                        isCompassOpen: $isCompassOpen
-                    )
+                    NavigationList()
 
-                    DetailRecord(
-//                        isCompassOpen: $isCompassOpen
-                    )
+                    DetailRecord()
                 }
                 .navigationTitle("GOParkin9")
                 .padding()
