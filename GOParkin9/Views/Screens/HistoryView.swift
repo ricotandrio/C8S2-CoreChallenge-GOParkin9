@@ -16,11 +16,20 @@ struct HistoryView: View {
     @Environment(\.modelContext) var context
 
     // This variable belongs to sort the history feature
-    @State private var isReverse = false
+    @State private var isReverse: Bool = false
     
     // This variable belongs to the select to delete feature
-    @State private var isSelecting = false
+    @State private var isSelecting: Bool = false
     @State private var selectedParkingRecords: Set<UUID> = []
+    
+    // This variable belongs to navigate to ConfigAutomaticDelete
+    @State private var navigateToConfigAutomaticDelete: Bool = false
+    
+    // This variable belongs to alert
+    @State private var showAlertHistoryEmpty: Bool = false
+    @State private var showAlertDeleteSelection: Bool = false
+    @State private var showAlertDeleteSingle: Bool = false
+    @State private var selectedHistoryToBeDeleted: ParkingRecord?
     
     // This variable used to fetch all history data
     @Query(
@@ -43,7 +52,7 @@ struct HistoryView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 if allParkingRecords.isEmpty {
                     Text("No history yet")
@@ -96,7 +105,10 @@ struct HistoryView: View {
                         HistoryComponent(
                             entry: entry,
                             pinItem: { pinItem(entry) },
-                            deleteItem: { deleteItem(entry) },
+                            deleteItem: {
+                                selectedHistoryToBeDeleted = entry
+                                showAlertDeleteSingle.toggle()
+                            },
                             isSelecting: isSelecting,
                             isSelected: selectedParkingRecords.contains(entry.id),
                             toggleSelection: { toggleSelection(entry) }
@@ -118,19 +130,22 @@ struct HistoryView: View {
                             Image(systemName: "arrow.up.arrow.down")
                         }
                         
-                        // Button for delete the history after certain days
                         Button {
-                            configureDeleteHistoryAfterInDay()
+                            navigateToConfigAutomaticDelete.toggle()
                         } label: {
                             Text("Delete Automatically")
-                            Text("After \(deleteHistoryAfterInDay) Days \(deleteHistoryAfterInDay == 5 ? "(Default)" : "")")
+                            Text("History will be deleted after \(deleteHistoryAfterInDay) days")
                                 .font(.subheadline)
                             Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
                         }
                         
                         // Button for cancel the selection
                         Button {
-                            cancelSelection()
+                            if !allParkingRecords.isEmpty {
+                                cancelSelection()
+                            } else {
+                                showAlertHistoryEmpty.toggle()
+                            }
                         } label: {
                             Text(isSelecting ? "Cancel" : "Select")
                             Text(isSelecting ? "Cancel Selection" : "Select Multiple")
@@ -141,7 +156,7 @@ struct HistoryView: View {
                         // Button for delete the selected history only if the selection is active
                         if isSelecting && !selectedParkingRecords.isEmpty {
                             Button {
-                                deleteSelection()
+                                showAlertDeleteSelection.toggle()
                             } label: {
                                 Text("Delete Selected")
                                 Text("\(selectedParkingRecords.count) selected")
@@ -153,6 +168,9 @@ struct HistoryView: View {
                         Image(systemName: "ellipsis.circle")
                     }
                 }
+            }
+            .navigationDestination(isPresented: $navigateToConfigAutomaticDelete) {
+                ConfigAutomaticDeleteView()
             }
         }
         .onAppear {
@@ -168,20 +186,30 @@ struct HistoryView: View {
 
             try? context.save()
         }
-    }
-    
-    // This function belongs to button for delete the history after certain days
-    private func configureDeleteHistoryAfterInDay() {
-        switch deleteHistoryAfterInDay {
-        case 5:
-            deleteHistoryAfterInDay = 7
-        case 7:
-            deleteHistoryAfterInDay = 14
-        case 14:
-            deleteHistoryAfterInDay = 30
-        default:
-            deleteHistoryAfterInDay = 5
-        }
+        .alertComponent(
+            isPresented: $showAlertHistoryEmpty,
+            title: "There's no history yet",
+            message: "Please complete a parking first.",
+            confirmButtonText: "OK"
+        )
+        .alertComponent(
+            isPresented: $showAlertDeleteSelection,
+            title: "Delete All Selected Records?",
+            message: "This action cannot be undone.",
+            confirmAction: deleteSelection,
+            confirmButtonText: "Delete"
+        )
+        .alertComponent(
+            isPresented: $showAlertDeleteSingle,
+            title: "Delete This Record?",
+            message: "This action cannot be undone.",
+            confirmAction: {
+                if let entry = selectedHistoryToBeDeleted {
+                    deleteItem(entry)
+                }
+            },
+            confirmButtonText: "Delete"
+        )
     }
     
     // This function belongs to button for cancel the selection
@@ -204,12 +232,9 @@ struct HistoryView: View {
     // This function belongs to button for check the selected history
     private func toggleSelection(_ entry: ParkingRecord) {
         withAnimation {
-            print(entry)
             if selectedParkingRecords.contains(entry.id) {
-                print("Removed")
                 selectedParkingRecords.remove(entry.id)
             } else {
-                print("Inserted")
                 selectedParkingRecords.insert(entry.id)
             }
         }
@@ -218,7 +243,6 @@ struct HistoryView: View {
     // This function belongs to pin button that can be accessed by swipe history
     private func pinItem(_ entry: ParkingRecord) {
         withAnimation {
-            
             entry.isPinned.toggle()
             try? context.save()
         }
@@ -242,7 +266,6 @@ struct HistoryComponent: View {
     let isSelected: Bool
     let toggleSelection: () -> Void
     
-
     var body: some View {
         HStack {
             if isSelecting {
@@ -313,7 +336,7 @@ struct HistoryComponent: View {
             }
             .tint(.yellow)
 
-            Button(role: .destructive) {
+            Button {
                 deleteItem()
             } label: {
                 Label("Delete", systemImage: "trash")
