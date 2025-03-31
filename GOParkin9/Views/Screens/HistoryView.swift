@@ -179,7 +179,7 @@ struct HistoryView: View {
             let expirationDate = calendar.date(byAdding: .day, value: -deleteHistoryAfterInDay, to: Date()) ?? Date()
 
             for entry in allParkingRecords {
-                if entry.createdAt < expirationDate {
+                if entry.createdAt < expirationDate && !entry.isPinned {
                     context.delete(entry)
                 }
             }
