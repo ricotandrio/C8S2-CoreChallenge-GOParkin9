@@ -214,6 +214,7 @@ struct GridView: View {
                 }
                 .fullScreenCover(isPresented: $showingCamera) {
                     CameraView(image: $newImage)
+                        .ignoresSafeArea()
                 }
                 .onChange(of: newImage) { newValue in
                     if let newImage = newValue {
@@ -225,4 +226,8 @@ struct GridView: View {
         }
         .padding()
     }
+}
+
+#Preview {
+    ContentView()
 }
