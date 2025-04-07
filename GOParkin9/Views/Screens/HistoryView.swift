@@ -123,14 +123,31 @@ struct HistoryView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
-                        // Button for sort the history by date
-                        Button {
-                            isReverse.toggle()
-                        } label: {
-                            Text("Sort by Date")
-                            Text("\(isReverse ? "Oldest First" : "Most Recent First")")
-                                .font(.subheadline)
-                            Image(systemName: "arrow.up.arrow.down")
+                 //error disini blum keubah
+                        Button(action: {}) {
+                            HStack{
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.gray)
+                                
+                                Spacer()
+                                
+                                VStack(alignment: .center) {
+                                    Text("Sort by Date")
+                                        .font(.headline)
+                                        .foregroundColor(.primary)
+                                    Text("Default (The Newest)")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                Spacer()
+                                
+                                Image(systemName: "arrow.up.arrow.down")
+                                    .foregroundColor(.gray)
+                            }
+                            .padding()
+                            .background(Color(.systemGray6)) // Light background
+                            .cornerRadius(10)
                         }
                         
                         Button {
@@ -272,83 +289,56 @@ struct HistoryComponent: View {
     let toggleSelection: () -> Void
     
     var body: some View {
-        HStack {
-
-            if isSelecting {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(isSelected ? Color.blue : Color.gray)
-                    .onTapGesture {
-                        toggleSelection()
+        //NavigationStack{
+            List{
+                ForEach(historyData) { entry in
+                    HStack {
+                        Image(systemName: "photo")
+                            .resizable()
+                            .frame(width: 60, height: 50)
+                            .padding(.trailing, 10)
+                        
+                        VStack(alignment: .leading) {
+                            Text(entry.date)
+                                .font(.headline)
+                                .padding(.vertical, 5)
+                            
+                            HStack {
+                                Image(systemName: "arrow.down.backward.circle")
+                                Text(entry.clockIn)
+                                
+                                Spacer()
+                                
+                                Image(systemName: "arrow.up.forward.circle")
+                                Text(entry.clockOut)
+                            }
+                            
+                        }
+                        
+                        if entry.isPinned {
+                            Image(systemName: "pin.fill")
+                                .foregroundColor(.yellow)
+                        }
                     }
-            }
-      
-            if entry.images.isEmpty {
-                Image(systemName: "photo")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 60, height: 60)
-                    .clipped()
-                    .padding(.trailing, 10)
-            } else {
-                Image(uiImage: entry.images[0].getImage())
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 60, height: 60)
-                    .clipped()
-                    .padding(.trailing, 10)
-            }
-           
-
-            VStack(alignment: .leading) {
-                Text(entry.createdAt, format: .dateTime.day().month().year())
-                    .font(.headline)
-                    .padding(.vertical, 5)
-
-                HStack {
-                    Image(systemName: "arrow.down.backward.circle")
-                    Text(entry.createdAt, format: .dateTime.hour().minute())
-                    
-                    Spacer()
-                    
-                    Image(systemName: "arrow.up.forward.circle")
-//                    if entry.completedAt.description.isEmpty {
-//                        Text(entry.createdAt, format: .dateTime.hour().minute())
-//                    } else {
-                        Text(entry.completedAt, format: .dateTime.hour().minute())
-//                    }
+                    .padding(.vertical, 10)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button {
+                            pinItem()
+                        } label: {
+                            Label("Pin", systemImage: "pin")
+                        }
+                        .tint(.yellow)
+                        
+                        Button(role: .destructive) {
+                            deleteItem()
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        .tint(.red)
+                    }
                 }
             }
-
-            if entry.isPinned {
-                Image(systemName: "pin.fill")
-                    .foregroundColor(.yellow)
-            }
-        }
-        .padding(.vertical, 10)
-        .onTapGesture {
-            if isSelecting {
-                toggleSelection()
-            }
-        }
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button {
-                pinItem()
-            } label: {
-                if entry.isPinned {
-                    Label("Unpin", systemImage: "pin.slash")
-                } else {
-                    Label("Pin", systemImage: "pin")
-                }
-            }
-            .tint(.yellow)
-
-            Button {
-                deleteItem()
-            } label: {
-                Label("Delete", systemImage: "trash")
-            }
-            .tint(.red)
-        }
+//        }
     }
 }
 
