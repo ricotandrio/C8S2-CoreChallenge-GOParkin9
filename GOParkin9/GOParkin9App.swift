@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct GOParkin9App: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([ParkingRecord.self]) // Register your model
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -21,23 +23,5 @@ struct GOParkin9App: App {
             ContentView()
                 .modelContainer(sharedModelContainer)
         }
-//        .modelContainer(for: [ParkingRecord.self])
     }
 }
-
-
-//@main
-//struct GOParkin9App: App {
-//    var sharedModelContainer: ModelContainer = {
-//        let schema = Schema([ParkingRecord.self]) // Register your model
-//        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-//        return try! ModelContainer(for: schema, configurations: [config])
-//    }()
-//
-//    var body: some Scene {
-//        WindowGroup {
-//            DetailRecord()
-//                .modelContainer(sharedModelContainer) // Attach model container
-//        }
-//    }
-//}

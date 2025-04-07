@@ -12,6 +12,8 @@ struct DetailRecord: View {
     @State private var selectedImageIndex = 0
     @State private var isPreviewOpen = false
     @State var isCompassOpen: Bool = false
+    
+    @State var isComplete: Bool = false
 
     @Query(filter: #Predicate<ParkingRecord>{p in p.isHistory == false}) var parkingRecords: [ParkingRecord]
 
@@ -20,6 +22,14 @@ struct DetailRecord: View {
     }
 
     @Query var parkingRecordss: [ParkingRecord]
+    @Environment(\.modelContext) var context
+    
+    func complete() {
+        firstParkingRecord?.isHistory.toggle()
+        firstParkingRecord?.completedAt = Date.now
+        try? context.save()
+        print("Complete")
+    }
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -32,7 +42,8 @@ struct DetailRecord: View {
                         isCompassOpen: $isCompassOpen,
                         selectedImageIndex: $selectedImageIndex,
                         dateTime: record.createdAt,
-                        parkingRecord: record
+                        parkingRecord: record,
+                        isComplete: $isComplete
                         
                     )
                 } else {
@@ -45,6 +56,13 @@ struct DetailRecord: View {
                     .fontWeight(.bold)
                     .opacity(0.6)
             }
+            .alertComponent(
+                isPresented: $isComplete,
+                title: "Complete this record?",
+                message: "This action cannot be undone.",
+                confirmAction: complete,
+                confirmButtonText: "Complete"
+            )
             .fullScreenCover(isPresented: $isPreviewOpen) {
                 if let image = firstParkingRecord?.images[selectedImageIndex].getImage() {
                     ImagePreviewView(imageName: image, isPresented: $isPreviewOpen)

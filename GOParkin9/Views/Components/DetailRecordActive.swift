@@ -15,6 +15,9 @@ struct DetailRecordActive: View {
     @State var dateTime: Date
     @State var parkingRecord: ParkingRecord
     @Environment(\.modelContext) var context
+    
+    @Binding var isComplete: Bool
+    
     var body: some View {
 //        Text(String(describing: parkingRecord.images))
         
@@ -178,10 +181,7 @@ struct DetailRecordActive: View {
             .frame(maxWidth: .infinity)
             
             Button {
-                parkingRecord.isHistory.toggle()
-                parkingRecord.completedAt = Date.now
-                try? context.save()
-                print("Complete")
+                isComplete.toggle()
             } label: {
                 HStack {
                     Image(systemName: "car")

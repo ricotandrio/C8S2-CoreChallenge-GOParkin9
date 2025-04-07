@@ -24,6 +24,7 @@ struct ContentView: View {
             }
         }
         .ignoresSafeArea(.keyboard)
+        .environment(\.sizeCategory, .large)
     }
 }
 
