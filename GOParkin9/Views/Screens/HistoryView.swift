@@ -80,7 +80,10 @@ struct HistoryView: View {
                         HistoryComponent(
                             entry: entry,
                             pinItem: { pinItem(entry) },
-                            deleteItem: { deleteItem(entry) },
+                            deleteItem: {
+                                selectedHistoryToBeDeleted = entry
+                                showAlertDeleteSingle.toggle()
+                            },
                             isSelecting: isSelecting,
                             isSelected: selectedParkingRecords.contains(entry.id),
                             toggleSelection: { toggleSelection(entry) }
@@ -273,82 +276,86 @@ struct HistoryComponent: View {
     let toggleSelection: () -> Void
     
     var body: some View {
-        HStack {
-
-            if isSelecting {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(isSelected ? Color.blue : Color.gray)
-                    .onTapGesture {
-                        toggleSelection()
-                    }
-            }
-      
-            if entry.images.isEmpty {
-                Image(systemName: "photo")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 60, height: 60)
-                    .clipped()
-                    .padding(.trailing, 10)
-            } else {
-                Image(uiImage: entry.images[0].getImage())
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 60, height: 60)
-                    .clipped()
-                    .padding(.trailing, 10)
-            }
-           
-
-            VStack(alignment: .leading) {
-                Text(entry.createdAt, format: .dateTime.day().month().year())
-                    .font(.headline)
-                    .padding(.vertical, 5)
-
-                HStack {
-                    Image(systemName: "arrow.down.backward.circle")
-                    Text(entry.createdAt, format: .dateTime.hour().minute())
-                    
-                    Spacer()
-                    
-                    Image(systemName: "arrow.up.forward.circle")
-//                    if entry.completedAt.description.isEmpty {
-//                        Text(entry.createdAt, format: .dateTime.hour().minute())
-//                    } else {
-                        Text(entry.completedAt, format: .dateTime.hour().minute())
-//                    }
+        NavigationLink(destination: DetailHistoryView(
+            parkingRecord: entry
+        )) {
+            HStack {
+                
+                if isSelecting {
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(isSelected ? Color.blue : Color.gray)
+                        .onTapGesture {
+                            toggleSelection()
+                        }
                 }
-            }
-
-            if entry.isPinned {
-                Image(systemName: "pin.fill")
-                    .foregroundColor(.yellow)
-            }
-        }
-        .padding(.vertical, 10)
-        .onTapGesture {
-            if isSelecting {
-                toggleSelection()
-            }
-        }
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button {
-                pinItem()
-            } label: {
-                if entry.isPinned {
-                    Label("Unpin", systemImage: "pin.slash")
+                
+                if entry.images.isEmpty {
+                    Image(systemName: "photo")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 60, height: 60)
+                        .clipped()
+                        .padding(.trailing, 10)
                 } else {
-                    Label("Pin", systemImage: "pin")
+                    Image(uiImage: entry.images[0].getImage())
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 60, height: 60)
+                        .clipped()
+                        .padding(.trailing, 10)
+                }
+                
+                
+                VStack(alignment: .leading) {
+                    Text(entry.createdAt, format: .dateTime.day().month().year())
+                        .font(.headline)
+                        .padding(.vertical, 5)
+                    
+                    HStack {
+                        Image(systemName: "arrow.down.backward.circle")
+                        Text(entry.createdAt, format: .dateTime.hour().minute())
+                        
+                        Spacer()
+                        
+                        Image(systemName: "arrow.up.forward.circle")
+                        //                    if entry.completedAt.description.isEmpty {
+                        //                        Text(entry.createdAt, format: .dateTime.hour().minute())
+                        //                    } else {
+                        Text(entry.completedAt, format: .dateTime.hour().minute())
+                        //                    }
+                    }
+                }
+                
+                if entry.isPinned {
+                    Image(systemName: "pin.fill")
+                        .foregroundColor(.yellow)
                 }
             }
-            .tint(.yellow)
-
-            Button {
-                deleteItem()
-            } label: {
-                Label("Delete", systemImage: "trash")
+            .padding(.vertical, 10)
+            .onTapGesture {
+                if isSelecting {
+                    toggleSelection()
+                }
             }
-            .tint(.red)
+            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                Button {
+                    pinItem()
+                } label: {
+                    if entry.isPinned {
+                        Label("Unpin", systemImage: "pin.slash")
+                    } else {
+                        Label("Pin", systemImage: "pin")
+                    }
+                }
+                .tint(.yellow)
+                
+                Button {
+                    deleteItem()
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+                .tint(.red)
+            }
         }
 
     }
