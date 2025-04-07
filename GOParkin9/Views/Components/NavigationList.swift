@@ -14,9 +14,10 @@ struct NavigationButton: Identifiable {
 }
 
 struct NavigationList: View {
+    @State private var isCompassOpen = true
     let navigations = [
-        NavigationButton(name: "Entry Gate A", icon: "pedestrian.gate.open"),
-        NavigationButton(name: "Exit Gate B", icon: "pedestrian.gate.closed"),
+        NavigationButton(name: "Entry Gate", icon: "pedestrian.gate.open"),
+        NavigationButton(name: "Exit Gate", icon: "pedestrian.gate.closed"),
         NavigationButton(name: "Charging Station", icon: "bolt.car"),
     ]
     
@@ -30,30 +31,41 @@ struct NavigationList: View {
             ) {
                 HStack {
                     ForEach(navigations) { navigation in
-                        VStack {
-                            Button {
-                                print(navigation.name)
-                            } label: {
-                                Image(systemName: navigation.icon)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 40, height: 40)
-                                    .foregroundColor(.blue)
-                                    .padding()
-                                    .background(Color.gray.opacity(0.2))
-                                    .cornerRadius(8)
-                            }
-                            .frame(width: 60, height: 60)
-                                                        
-                            Spacer()
-                                .frame(height: 10)
+                        
+                            NavigationLink(destination: {
+                                CompassView(
+                                    isCompassOpen: $isCompassOpen,
+                                    selectedLocation: navigation.name,
+                                    longitude: 0,
+                                    latitude: 0
+                                )
+                            }, label: {
+                                    VStack {
+                                        Image(systemName: navigation.icon)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 40, height: 40)
+                                            .foregroundColor(.blue)
+                                            .padding()
+                                            .background(Color.gray.opacity(0.2))
+                                            .cornerRadius(8)
+                                            .frame(width: 60, height: 60)
+                                                                
+//                                        Spacer()
+//                                            .frame(height: 10)
+                                        
+                                        Text(navigation.name)
+                                            .font(.caption)
+                                            .fontWeight(.bold)
+                                            .multilineTextAlignment(.center)
+                                            .padding(10)
+                                    }.frame(maxWidth: .infinity)
+                                    .contentShape(Rectangle())
+                        
+                            }).buttonStyle(PlainButtonStyle())
                             
-                            Text(navigation.name)
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .multilineTextAlignment(.center)
                             
-                        }
+                        
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

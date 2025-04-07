@@ -7,27 +7,20 @@
 //
 
 import SwiftUI
+import SwiftData
 
-// Data Model
-struct HistoryEntry: Identifiable {
-    let id: UUID = UUID()
-    let date: String
-    let clockIn: String
-    let clockOut: String
-    var isPinned: Bool
-}
 
 struct HistoryView: View {
-    @State private var historyData = [
-        HistoryEntry(date: "18 March 2025", clockIn: "08:45 AM", clockOut: "04:56 PM", isPinned: false),
-        HistoryEntry(date: "19 March 2025", clockIn: "09:00 AM", clockOut: "05:10 PM", isPinned: false),
-        HistoryEntry(date: "20 March 2025", clockIn: "08:30 AM", clockOut: "04:45 PM", isPinned: false)
-    ]
+    
+    @Query(filter: #Predicate<ParkingRecord>{p in p.isHistory == true}) var parkingRecords: [ParkingRecord]
+    
+    @Environment(\.modelContext) var context
 
+    
     var body: some View {
         NavigationView {
             List {
-                ForEach(historyData) { entry in
+                ForEach(parkingRecords) { entry in
                     HistoryComponent(entry: entry, pinItem: { pinItem(entry) }, deleteItem: { deleteItem(entry) })
                 }
             }
@@ -59,44 +52,58 @@ struct HistoryView: View {
         }
     }
 
-    // Function to pin/unpin an item
-    func pinItem(_ entry: HistoryEntry) {
-        if let index = historyData.firstIndex(where: { $0.id == entry.id }) {
-            historyData[index].isPinned.toggle()
-        }
+    private func pinItem(_ entry: ParkingRecord) {
+        entry.isPinned.toggle()
+        try? context.save()
     }
-
-    // Function to delete an item
-    func deleteItem(_ entry: HistoryEntry) {
-        historyData.removeAll { $0.id == entry.id }
+    
+    private func deleteItem(_ entry: ParkingRecord) {
+        context.delete(entry)
+        try? context.save()
     }
 }
 
 struct HistoryComponent: View {
-    let entry: HistoryEntry
+    let entry: ParkingRecord
     let pinItem: () -> Void
     let deleteItem: () -> Void
 
     var body: some View {
         HStack {
-            Image(systemName: "photo")
-                .resizable()
-                .frame(width: 60, height: 50)
-                .padding(.trailing, 10)
+            if entry.images.isEmpty {
+                Image(systemName: "photo")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 60, height: 60)
+                    .clipped()
+                    .padding(.trailing, 10)
+            } else {
+                Image(uiImage: entry.images[0].getImage())
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 60, height: 60)
+                    .clipped()
+                    .padding(.trailing, 10)
+            }
+           
 
             VStack(alignment: .leading) {
-                Text(entry.date)
+                Text(entry.createdAt, format: .dateTime.day().month().year())
                     .font(.headline)
                     .padding(.vertical, 5)
 
                 HStack {
                     Image(systemName: "arrow.down.backward.circle")
-                    Text(entry.clockIn)
+                    Text(entry.createdAt, format: .dateTime.hour().minute())
                     
                     Spacer()
                     
                     Image(systemName: "arrow.up.forward.circle")
-                    Text(entry.clockOut)
+//                    if entry.completedAt.description.isEmpty {
+//                        Text(entry.createdAt, format: .dateTime.hour().minute())
+//                    } else {
+                        Text(entry.completedAt, format: .dateTime.hour().minute())
+//                    }
                 }
             }
 
