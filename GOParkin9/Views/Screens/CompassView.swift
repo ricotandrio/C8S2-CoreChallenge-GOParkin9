@@ -35,10 +35,10 @@ struct CompassView: View {
     var speechUtteranceManager = SpeechUtteranceManager()
     
     var targetDestination: CLLocationCoordinate2D {
-        options.first(where:
-            { $0.name == selectedLocation })?.coordinate ??
-        CLLocationCoordinate2D(latitude: 0, longitude: 0
-        )
+
+        options.first(where: { $0.name == selectedLocation })?.coordinate ??
+            CLLocationCoordinate2D(latitude: 0, longitude: 0)
+
     }
     
     var currentAngle: Double {
@@ -85,6 +85,7 @@ struct CompassView: View {
     }
     
     func appendLocation() {
+
         if selectedLocation=="Parking Location" {
             options.append(Location(name: selectedLocation, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)))
         }

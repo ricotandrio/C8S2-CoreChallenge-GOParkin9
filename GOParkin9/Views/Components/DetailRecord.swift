@@ -11,12 +11,9 @@ import SwiftData
 struct DetailRecord: View {
     @State private var selectedImageIndex = 0
     @State private var isPreviewOpen = false
-    @State var isCompassOpen = false
-    
+    @State var isCompassOpen: Bool = false
 
- 
     @Query(filter: #Predicate<ParkingRecord>{p in p.isHistory == false}) var parkingRecords: [ParkingRecord]
-    
 
     var firstParkingRecord: ParkingRecord? {
         parkingRecords.first
@@ -54,6 +51,7 @@ struct DetailRecord: View {
                 }
             }
             .fullScreenCover(isPresented: $isCompassOpen) {
+
                 if let record = firstParkingRecord {
                     CompassView(
                         isCompassOpen: $isCompassOpen,
@@ -68,5 +66,5 @@ struct DetailRecord: View {
 }
 
 #Preview {
-    DetailRecord()
+    ContentView()
 }

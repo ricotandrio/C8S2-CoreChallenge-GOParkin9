@@ -155,6 +155,7 @@ struct DetailRecordActive: View {
         
         HStack(spacing: 16) {
             Button {
+                print("Navigate")
                 isCompassOpen.toggle()
             } label: {
                 HStack {
