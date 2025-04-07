@@ -91,15 +91,18 @@ struct CompassView: View {
         }
     }
     
-    var formattedDistance: String {
+
+    var formattedDistance: (String, Int) {
         let distance = navigationManager.distance(to: targetDestination)
         if distance > 999 {
-            return String(format: "%.2f km", distance / 1000)
+            return (String(format: "%.2f km", distance / 1000), Int(distance))
         } else {
-            return "\(Int(distance)) m"
+            return ("\(Int(distance)) m", Int(distance))
         }
     }
     
+    @State private var isPulsing = false
+
     var body: some View {
         
         VStack {
@@ -129,33 +132,65 @@ struct CompassView: View {
             .padding()
             
             Spacer()
-
-            Image(systemName: "arrow.up")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 150, height: 200)
-                .foregroundColor(Color.white)
-                .rotationEffect(.degrees(currentAngle))
-                .animation(.easeInOut(duration: 0.5), value: currentAngle)
-                .onTapGesture {
-                    speak("Turn to the \(clockDirection)")
+            
+            ZStack {
+                if formattedDistance.1 < 2 {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 150, height: 150)
+                        .scaleEffect(isPulsing ? 1.2 : 0.8)
+                        .opacity(isPulsing ? 0.5 : 1.0)
+                        .transition(.scale.combined(with: .opacity))
+                        .onAppear {
+                            withAnimation(Animation.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                                isPulsing.toggle()
+                            }
+                        }
+                        .onTapGesture {
+                            speak("You have arrived at \(selectedLocation)")
+                        }
+                } else {
+                    Image(systemName: "arrow.up")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 150, height: 200)
+                        .foregroundColor(Color.white)
+                        .rotationEffect(.degrees(currentAngle))
+                        .animation(.easeInOut(duration: 0.5), value: currentAngle)
+                        .onTapGesture {
+                            speak("Turn to the \(clockDirection)")
+                        }
                 }
+            }
+            .animation(.easeInOut(duration: 0.5), value: formattedDistance.1)
             
             Spacer()
-            
-            Text("Turn to the \(clockDirection)")
-                .font(.headline)
-                .foregroundColor(.white)
-                .fontWeight(.bold)
-                .onTapGesture {
-                    speak("Turn to the \(clockDirection)")
-                }
-            
-            Text("\(formattedDistance) to \(selectedLocation)")
-                .font(.headline)
-                .foregroundColor(.white)
-                .fontWeight(.medium)
-                .opacity(0.8)
+
+            if formattedDistance.1 < 2 {
+                Text("Check nearby vehicle in the area")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .fontWeight(.bold)
+                
+                Text("You have arrived at \(selectedLocation)")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .fontWeight(.medium)
+                    .opacity(0.8)
+                
+            } else {
+                Text("Turn to the \(clockDirection)")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .fontWeight(.bold)
+                
+                Text("\(formattedDistance.0) to \(selectedLocation)")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .fontWeight(.medium)
+                    .opacity(0.8)
+            }
+
             
             Spacer()
                 .frame(height: 20)
@@ -190,6 +225,7 @@ struct CompassView: View {
                         .padding(20)
                         .background(Color.gray.opacity(0.5))
                         .clipShape(Circle())
+                        .animation(nil, value: isSpeechEnabled)
                 }
 
             }
