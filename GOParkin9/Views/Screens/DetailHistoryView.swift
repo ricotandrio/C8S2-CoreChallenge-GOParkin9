@@ -7,44 +7,112 @@
 
 import SwiftUI
 
-struct HistoryDetail: View {
-    // Sample data
-    let images = ["3CF9C512-DE75-4C62-B038-553BFBCED56A_1_105_c", "4D6A4712-F6CD-4E23-A454-8CF3FD2B12B4_1_105_c", "BAE36E3B-F571-4CAB-A27D-333964AC4452_1_105_c"]
-    let date = "24 Mar 2025"
-    let location = "1st Floor"
-    let clockIn = "08.47 AM"
-    let clockOut = "05.45 PM"
+struct DetailHistoryView: View {
+    
+    let parkingRecord: ParkingRecord
+    
+    @State var isPreviewOpen: Bool = false
+    @State var selectedImageIndex: Int = 0
+    @State var isCompassOpen: Bool = false
+    @Environment(\.dismiss) var dismiss
+    
+    @State var isDeleteConfirmationAlertOpen: Bool = false
+    
+    @Environment(\.modelContext) var context
+    
+    // This function belongs to delete button
+    private func deleteItem(_ entry: ParkingRecord) {
+        withAnimation {
+            context.delete(entry)
+            try? context.save()
+        }
 
-//    @Environment(\.dismiss) var dismiss // For navigation back
-
+    }
+    
+    // This function belongs to pin button
+    private func pinItem(_ entry: ParkingRecord) {
+        withAnimation {
+            entry.isPinned.toggle()
+            try? context.save()
+        }
+    }
+    
+    @State private var selectedHistoryToBeDeleted: ParkingRecord?
+    @State private var selectedHistoryToBePinned: ParkingRecord?
+    
     var body: some View {
         VStack(spacing: 16) {
             // Image Slider
-            TabView {
-                ForEach(images, id: \.self) { image in
-                    Image(image)
+            ZStack {
+                if parkingRecord.images.isEmpty {
+                    Text("There's no image")
+                        .foregroundColor(.red)
+                        .font(.headline)
+                } else {
+                    Image(uiImage: parkingRecord.images[selectedImageIndex].getImage())
                         .resizable()
                         .scaledToFill()
-                        .frame(height: 250)
+                        .frame(maxHeight: 200)
+                        .animation(.easeInOut, value: selectedImageIndex)
                         .clipped()
-                        .cornerRadius(10)
+                }
+                
+
+                
+                HStack{
+                    Color
+                        .clear
+                        .frame(width: UIScreen.main.bounds.width / 3, height: .infinity)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation {
+                                selectedImageIndex = (selectedImageIndex - 1) == -1 ? parkingRecord.images.count - 1 : selectedImageIndex - 1
+                            }
+                        }
+                    
+                    Color
+                        .clear
+                        .frame(height: .infinity)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            isPreviewOpen.toggle()
+                        }
+                    
+                    Color
+                        .clear
+                        .frame(width: UIScreen.main.bounds.width / 3, height: .infinity)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation {
+                                selectedImageIndex = (selectedImageIndex + 1) % parkingRecord.images.count
+                            }
+                        }
                 }
             }
-            .frame(height: 250)
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+            
+            HStack {
+                ForEach(0..<parkingRecord.images.count, id: \.self) { index in
+                    Circle()
+                        .frame(width: 10, height: 10)
+                        .foregroundColor(index == selectedImageIndex ? .blue : .gray.opacity(0.6))
+                        .onTapGesture {
+                            selectedImageIndex = index
+                        }
+                }
+            }
             
             // Details
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     HStack {
                         Image(systemName: "stairs")
-                        Text("\(location)")
+                        Text(parkingRecord.floor)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     Spacer()
                     HStack {
                         Image(systemName: "calendar")
-                        Text("\(date)")
+                        Text(parkingRecord.createdAt, format: .dateTime.day().month().year())
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
@@ -52,13 +120,13 @@ struct HistoryDetail: View {
                 HStack {
                     HStack {
                         Image(systemName:"arrow.down.backward.circle")
-                        Text("\(clockIn)")
+                        Text(parkingRecord.createdAt, format: .dateTime.hour().minute())
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     Spacer()
                     HStack {
                         Image(systemName:"arrow.up.forward.circle")
-                        Text("\(clockOut)")
+                        Text(parkingRecord.completedAt, format: .dateTime.hour().minute())
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
@@ -67,20 +135,41 @@ struct HistoryDetail: View {
             .padding()
             
             // Button
-            Button(action: {
-            }) {Text("Navigate Back")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
+            Button {
+                print("Navigate Back")
+                isCompassOpen.toggle()
+            } label: {
+                HStack {
+                    Image(systemName: "figure.walk")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 15)
+                    
+                    Text("Navigate Back")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
             }
+            
             HStack {
                 Button(action: {
+                    selectedHistoryToBeDeleted = parkingRecord
+                    isDeleteConfirmationAlertOpen.toggle()
                 }) {
                     HStack {
                         Image(systemName: "trash")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 15)
+                        
                         Text("Delete")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -88,11 +177,20 @@ struct HistoryDetail: View {
                     .foregroundColor(.white)
                     .cornerRadius(10)
                 }
+                
                 Button(action: {
+                    pinItem(parkingRecord)
+                    dismiss()
                 }) {
                     HStack {
-                        Image(systemName: "pin")
-                        Text("Pin History")
+                        Image(systemName: parkingRecord.isPinned ? "pin.slash" : "pin")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 15)
+
+                        Text(parkingRecord.isPinned ? "Unpin History" : "Pin History")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -103,25 +201,48 @@ struct HistoryDetail: View {
             }
         }
         .padding()
-        .navigationTitle("\(date)")
+        .navigationTitle("\(parkingRecord.createdAt, format: .dateTime.day().month().year())")
         .navigationBarTitleDisplayMode(.inline)
-        
-        Spacer()
-    }
-}
-
-
-struct HistoryDetailView: View {
-    var body: some View {
-        NavigationStack {
-            NavigationLink("History Detail") {
-                HistoryDetail()
-            }
-            .navigationTitle("History")
+        .alertComponent(
+            isPresented: $isDeleteConfirmationAlertOpen,
+            title: "Delete This Record?",
+            message: "This action cannot be undone.",
+            confirmAction: {
+                if let record = selectedHistoryToBeDeleted {
+                    deleteItem(record)
+                    dismiss()
+                }
+            },
+            confirmButtonText: "Delete"
+        )
+        .fullScreenCover(isPresented: $isPreviewOpen) {
+            
+                ImagePreviewView(
+                    imageName: parkingRecord.images[selectedImageIndex].getImage(),
+                    isPresented: $isPreviewOpen
+                )
+            
         }
+        Spacer()
+            .fullScreenCover(isPresented: $isCompassOpen) {
+                CompassView(
+                    isCompassOpen: $isCompassOpen,
+                    selectedLocation: "Parking Location History",
+                    longitude: parkingRecord.longitude,
+                    latitude: parkingRecord.latitude
+                )
+            }
     }
 }
 
-#Preview {
-    HistoryDetailView()
-}
+//
+//struct HistoryDetailView: View {
+//    var body: some View {
+//        NavigationStack {
+//            NavigationLink("History Detail") {
+//                HistoryDetail()
+//            }
+//            .navigationTitle("History")
+//        }
+//    }
+//}
