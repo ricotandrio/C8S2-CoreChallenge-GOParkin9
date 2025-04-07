@@ -35,11 +35,31 @@ struct HistoryView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
+                 //error disini blum keubah
                         Button(action: {}) {
-                            Text("Sort by Date")
-                            Text("Default (The Newest)")
-                                .font(.subheadline)
-                            Image(systemName: "arrow.up.arrow.down")
+                            HStack{
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.gray)
+                                
+                                Spacer()
+                                
+                                VStack(alignment: .center) {
+                                    Text("Sort by Date")
+                                        .font(.headline)
+                                        .foregroundColor(.primary)
+                                    Text("Default (The Newest)")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                Spacer()
+                                
+                                Image(systemName: "arrow.up.arrow.down")
+                                    .foregroundColor(.gray)
+                            }
+                            .padding()
+                            .background(Color(.systemGray6)) // Light background
+                            .cornerRadius(10)
                         }
                         Button(action: {}) {
                             Text("Delete Automatically")
@@ -76,51 +96,63 @@ struct HistoryComponent: View {
     let entry: HistoryEntry
     let pinItem: () -> Void
     let deleteItem: () -> Void
+    let historyData: [HistoryEntry] = [
+            HistoryEntry(date: "2025-03-30", clockIn: "08:00", clockOut: "17:00", isPinned: false),
+            HistoryEntry(date: "2025-03-29", clockIn: "08:10", clockOut: "17:05", isPinned: true),
+            HistoryEntry(date: "2025-03-28", clockIn: "08:15", clockOut: "16:55", isPinned: false)
+        ]
 
     var body: some View {
-        HStack {
-            Image(systemName: "photo")
-                .resizable()
-                .frame(width: 60, height: 50)
-                .padding(.trailing, 10)
-
-            VStack(alignment: .leading) {
-                Text(entry.date)
-                    .font(.headline)
-                    .padding(.vertical, 5)
-
-                HStack {
-                    Image(systemName: "arrow.down.backward.circle")
-                    Text(entry.clockIn)
-                    
-                    Spacer()
-                    
-                    Image(systemName: "arrow.up.forward.circle")
-                    Text(entry.clockOut)
+        //NavigationStack{
+            List{
+                ForEach(historyData) { entry in
+                    HStack {
+                        Image(systemName: "photo")
+                            .resizable()
+                            .frame(width: 60, height: 50)
+                            .padding(.trailing, 10)
+                        
+                        VStack(alignment: .leading) {
+                            Text(entry.date)
+                                .font(.headline)
+                                .padding(.vertical, 5)
+                            
+                            HStack {
+                                Image(systemName: "arrow.down.backward.circle")
+                                Text(entry.clockIn)
+                                
+                                Spacer()
+                                
+                                Image(systemName: "arrow.up.forward.circle")
+                                Text(entry.clockOut)
+                            }
+                            
+                        }
+                        
+                        if entry.isPinned {
+                            Image(systemName: "pin.fill")
+                                .foregroundColor(.yellow)
+                        }
+                    }
+                    .padding(.vertical, 10)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button {
+                            pinItem()
+                        } label: {
+                            Label("Pin", systemImage: "pin")
+                        }
+                        .tint(.yellow)
+                        
+                        Button(role: .destructive) {
+                            deleteItem()
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        .tint(.red)
+                    }
                 }
             }
-
-            if entry.isPinned {
-                Image(systemName: "pin.fill")
-                    .foregroundColor(.yellow)
-            }
-        }
-        .padding(.vertical, 10)
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button {
-                pinItem()
-            } label: {
-                Label("Pin", systemImage: "pin")
-            }
-            .tint(.yellow)
-
-            Button(role: .destructive) {
-                deleteItem()
-            } label: {
-                Label("Delete", systemImage: "trash")
-            }
-            .tint(.red)
-        }
+//        }
     }
 }
 
