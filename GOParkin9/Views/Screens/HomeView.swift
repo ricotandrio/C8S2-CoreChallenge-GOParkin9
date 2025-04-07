@@ -12,9 +12,11 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+
                     NavigationList()
 
                     DetailRecord()
+
                 }
                 .navigationTitle("GOParkin9")
                 .padding()

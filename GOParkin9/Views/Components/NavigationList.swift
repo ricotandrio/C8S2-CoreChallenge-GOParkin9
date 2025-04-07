@@ -14,10 +14,11 @@ struct NavigationButton: Identifiable {
 }
 
 struct NavigationList: View {
+
     @State var isCompassOpen: Bool = false
     
     @State var selectedNavigationName = ""
-    
+
     let navigations = [
         NavigationButton(name: "Entry Gate", icon: "pedestrian.gate.open"),
         NavigationButton(name: "Exit Gate", icon: "pedestrian.gate.closed"),
@@ -34,6 +35,7 @@ struct NavigationList: View {
             ) {
                 HStack(alignment: .top) {
                     ForEach(navigations) { navigation in
+
                         Button {
                             selectedNavigationName = navigation.name
                         } label: {
@@ -60,6 +62,7 @@ struct NavigationList: View {
                         }
                         Spacer()
                             .frame(width: 20)
+
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)

@@ -11,6 +11,7 @@ import SwiftData
 
 
 struct HistoryView: View {
+
     @AppStorage("deleteHistoryAfterInDay") var deleteHistoryAfterInDay: Int = 5
 
     @Environment(\.modelContext) var context
@@ -54,6 +55,7 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             List {
+
                 if allParkingRecords.isEmpty {
                     Text("No history yet")
                         .foregroundColor(.secondary)
@@ -114,6 +116,7 @@ struct HistoryView: View {
                             toggleSelection: { toggleSelection(entry) }
                         )
                     }
+
                 }
             }
             .navigationTitle("History")
@@ -177,6 +180,7 @@ struct HistoryView: View {
             // This responsible for delete the history after certain days
             let calendar = Calendar.current
             let expirationDate = calendar.date(byAdding: .day, value: -deleteHistoryAfterInDay, to: Date()) ?? Date()
+
 
             for entry in allParkingRecords {
                 if entry.createdAt < expirationDate && !entry.isPinned {
@@ -254,6 +258,7 @@ struct HistoryView: View {
             context.delete(entry)
             try? context.save()
         }
+
     }
 }
 
@@ -268,6 +273,7 @@ struct HistoryComponent: View {
     
     var body: some View {
         HStack {
+
             if isSelecting {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(isSelected ? Color.blue : Color.gray)
@@ -275,7 +281,7 @@ struct HistoryComponent: View {
                         toggleSelection()
                     }
             }
-            
+      
             if entry.images.isEmpty {
                 Image(systemName: "photo")
                     .resizable()

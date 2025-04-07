@@ -30,11 +30,15 @@ struct CompassView: View {
         Location(name: "Charging Station", coordinate: CLLocationCoordinate2D(latitude: -16.2963229765925615, longitude: 66.64088135638036))
     ]
     
+
+    
     var speechUtteranceManager = SpeechUtteranceManager()
     
     var targetDestination: CLLocationCoordinate2D {
+
         options.first(where: { $0.name == selectedLocation })?.coordinate ??
             CLLocationCoordinate2D(latitude: 0, longitude: 0)
+
     }
     
     var currentAngle: Double {
@@ -81,11 +85,13 @@ struct CompassView: View {
     }
     
     func appendLocation() {
+
         if selectedLocation=="Parking Location" {
             options.append(Location(name: selectedLocation, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)))
         }
     }
     
+
     var formattedDistance: (String, Int) {
         let distance = navigationManager.distance(to: targetDestination)
         if distance > 999 {
@@ -96,7 +102,7 @@ struct CompassView: View {
     }
     
     @State private var isPulsing = false
-    
+
     var body: some View {
         
         VStack {
@@ -121,6 +127,7 @@ struct CompassView: View {
                 .pickerStyle(WheelPickerStyle())
                 .frame(height: 80)
                 .padding(.leading, -10)
+//                Text("\(option)")
             }
             .padding()
             
@@ -158,7 +165,6 @@ struct CompassView: View {
             .animation(.easeInOut(duration: 0.5), value: formattedDistance.1)
             
             Spacer()
-            
 
             if formattedDistance.1 < 2 {
                 Text("Check nearby vehicle in the area")
@@ -184,6 +190,7 @@ struct CompassView: View {
                     .fontWeight(.medium)
                     .opacity(0.8)
             }
+
             
             Spacer()
                 .frame(height: 20)
