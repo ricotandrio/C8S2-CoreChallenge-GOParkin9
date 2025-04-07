@@ -11,7 +11,7 @@ import AVFoundation
 class SpeechUtteranceManager {
     private let synthesizer = AVSpeechSynthesizer()
     
-    func speak(text: String, identifier: String = "com.apple.speech.synthesis.voice.Fred") {
+    func speak(text: String, identifier: String = "com.apple.speech.synthesis.voice.Nicky") {
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(identifier: identifier)
         synthesizer.speak(utterance)

@@ -6,17 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DetailRecordActive: View {
     @Binding var isPreviewOpen: Bool
     @Binding var isCompassOpen: Bool
     @Binding var selectedImageIndex: Int
     @State var dateTime: Date
-    
-    @State var images: [String]
-    
     @State var parkingRecord: ParkingRecord
-    
+    @Environment(\.modelContext) var context
     var body: some View {
 //        Text(String(describing: parkingRecord.images))
         
@@ -85,26 +83,49 @@ struct DetailRecordActive: View {
         
         Spacer()
             .frame(height: 20)
-        
-        VStack(alignment: .leading) {
-            HStack {
-                Image(systemName: "calendar")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 20, height: 20)
-                    .opacity(0.6)
-                
-                Text("Date")
-                    .font(.subheadline)
-                    .fontWeight(.bold)
-                    .opacity(0.6)
-                
-            }
-            
-            Text(dateTime, format: .dateTime.day().month().year())
-                .font(.subheadline)
-                .fontWeight(.bold)
+        Grid {
+            GridRow {
+                VStack(alignment: .leading) {
+                    HStack {
+                        Image(systemName: "calendar")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .opacity(0.6)
+                        
+                        Text("Date")
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                            .opacity(0.6)
+                        
+                    }
+                    
+                    Text(dateTime, format: .dateTime.day().month().year())
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                }
+                VStack(alignment: .leading) {
+                    HStack {
+                        Image(systemName: "clock")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .opacity(0.6)
+                        
+                        Text("Clock in")
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                            .opacity(0.6)
+                        
+                    }
+                    
+                    Text(dateTime, format: .dateTime.hour().minute())
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                }
+            }.frame(maxWidth: .infinity, alignment: .leading)
         }
+        
         
         Spacer()
             .frame(height: 20)
@@ -124,7 +145,7 @@ struct DetailRecordActive: View {
                 
             }
             
-            Text("GOP 9")
+            Text("GOP 9, \(parkingRecord.floor)")
                 .font(.subheadline)
                 .fontWeight(.bold)
         }
@@ -134,6 +155,7 @@ struct DetailRecordActive: View {
         
         HStack(spacing: 16) {
             Button {
+                print("Navigate")
                 isCompassOpen.toggle()
             } label: {
                 HStack {
@@ -157,6 +179,8 @@ struct DetailRecordActive: View {
             
             Button {
                 parkingRecord.isHistory.toggle()
+                parkingRecord.completedAt = Date.now
+                try? context.save()
                 print("Complete")
             } label: {
                 HStack {

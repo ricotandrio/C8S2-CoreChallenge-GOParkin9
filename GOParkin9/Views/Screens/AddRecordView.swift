@@ -97,19 +97,19 @@ struct ModalView: View {
             
             
             GridView(images: $images, isImageFullscreen: $isImageFullscreen, selectedImage: $selectedImage)
-            Grid(alignment: .leading) {
+            Grid {
                 GridRow {
                     HStack {
                         Image(systemName: "calendar")
                         Text(dateTime, format: .dateTime.day().month().year())
-                    }.frame(maxWidth: .infinity, alignment: .leading)
+                    }
                     
                     HStack {
                         Image(systemName: "clock")
                         Text(dateTime, format: .dateTime.hour().minute())
-                    }.frame(maxWidth: .infinity, alignment: .trailing)
-                }
-            }.padding().frame(maxWidth: .infinity)
+                    }
+                }.frame(maxWidth: .infinity, alignment: .leading)
+            }.padding()
             HStack {
                 Image(systemName: "stairs")
                 Picker("Floor", selection: $selectedFloor) {
@@ -214,6 +214,7 @@ struct GridView: View {
                 }
                 .fullScreenCover(isPresented: $showingCamera) {
                     CameraView(image: $newImage)
+                        .ignoresSafeArea()
                 }
                 .onChange(of: newImage) { newValue in
                     if let newImage = newValue {
@@ -225,4 +226,8 @@ struct GridView: View {
         }
         .padding()
     }
+}
+
+#Preview {
+    ContentView()
 }

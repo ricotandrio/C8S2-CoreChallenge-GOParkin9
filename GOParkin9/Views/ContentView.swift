@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedTab = "Home"
 
     var body: some View {
         VStack {
-            TabView(selection: $selectedTab) {
+            TabView {
                 HomeView()
                    .tabItem {
                        Label("Menu", systemImage: "house")
@@ -22,7 +21,6 @@ struct ContentView: View {
                    .tabItem {
                        Label("History", systemImage: "clock")
                    }
-                   .badge(2)
             }
         }
         .ignoresSafeArea(.keyboard)

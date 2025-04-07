@@ -14,9 +14,14 @@ struct NavigationButton: Identifiable {
 }
 
 struct NavigationList: View {
+
+    @State var isCompassOpen: Bool = false
+    
+    @State var selectedNavigationName = ""
+
     let navigations = [
-        NavigationButton(name: "Entry Gate A", icon: "pedestrian.gate.open"),
-        NavigationButton(name: "Exit Gate B", icon: "pedestrian.gate.closed"),
+        NavigationButton(name: "Entry Gate", icon: "pedestrian.gate.open"),
+        NavigationButton(name: "Exit Gate", icon: "pedestrian.gate.closed"),
         NavigationButton(name: "Charging Station", icon: "bolt.car"),
     ]
     
@@ -28,12 +33,13 @@ struct NavigationList: View {
                     .fontWeight(.bold)
                     .opacity(0.6)
             ) {
-                HStack {
+                HStack(alignment: .top) {
                     ForEach(navigations) { navigation in
-                        VStack {
-                            Button {
-                                print(navigation.name)
-                            } label: {
+
+                        Button {
+                            selectedNavigationName = navigation.name
+                        } label: {
+                            VStack {
                                 Image(systemName: navigation.icon)
                                     .resizable()
                                     .scaledToFit()
@@ -42,22 +48,41 @@ struct NavigationList: View {
                                     .padding()
                                     .background(Color.gray.opacity(0.2))
                                     .cornerRadius(8)
+                                    .frame(width: 60, height: 60)
+                                
+                                Text(navigation.name)
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .multilineTextAlignment(.center)
+                                    .frame(maxWidth: 60)
+                                    .padding(5)
+                                    .foregroundStyle(Color.black)
                             }
-                            .frame(width: 60, height: 60)
-                                                        
-                            Spacer()
-                                .frame(height: 10)
-                            
-                            Text(navigation.name)
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .multilineTextAlignment(.center)
-                            
+                            .contentShape(Rectangle())
                         }
+                        Spacer()
+                            .frame(width: 20)
+
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .onChange(of: selectedNavigationName) {
+                    isCompassOpen.toggle()
+                }
+                .fullScreenCover(isPresented: $isCompassOpen) {
+                    CompassView(
+                        isCompassOpen: $isCompassOpen,
+                        selectedLocation: selectedNavigationName,
+                        longitude: 0,
+                        latitude: 0
+                    )
+                }
             }
         }
+
     }
+}
+
+#Preview {
+    ContentView()
 }

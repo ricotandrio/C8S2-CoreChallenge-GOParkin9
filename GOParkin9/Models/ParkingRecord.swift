@@ -17,6 +17,7 @@ class ParkingRecord: Identifiable {
     var isHistory: Bool
     var isPinned: Bool
     var createdAt: Date
+    var completedAt: Date
     var floor: String
     
     @Relationship(deleteRule: .cascade) var images: [ParkingImage] = []
@@ -27,6 +28,7 @@ class ParkingRecord: Identifiable {
         isHistory: Bool,
         floor: String,
         createdAt: Date,
+//        completedAt: Date,
         images: [ParkingImage]
     ) {
         self.latitude = latitude
@@ -34,6 +36,7 @@ class ParkingRecord: Identifiable {
         self.isHistory = false
         self.isPinned = false
         self.createdAt = Date()
+        self.completedAt = Date()
         self.images = images
         self.floor = floor
     }

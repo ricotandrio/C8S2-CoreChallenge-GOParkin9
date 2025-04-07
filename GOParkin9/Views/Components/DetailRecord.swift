@@ -11,16 +11,9 @@ import SwiftData
 struct DetailRecord: View {
     @State private var selectedImageIndex = 0
     @State private var isPreviewOpen = false
-    @State var isCompassOpen = false
-    
-    let images = [
-        "3CF9C512-DE75-4C62-B038-553BFBCED56A_1_105_c",
-        "BAE36E3B-F571-4CAB-A27D-333964AC4452_1_105_c",
-        "4D6A4712-F6CD-4E23-A454-8CF3FD2B12B4_1_105_c",
-    ]
- 
+    @State var isCompassOpen: Bool = false
+
     @Query(filter: #Predicate<ParkingRecord>{p in p.isHistory == false}) var parkingRecords: [ParkingRecord]
-    
 
     var firstParkingRecord: ParkingRecord? {
         parkingRecords.first
@@ -39,30 +32,13 @@ struct DetailRecord: View {
                         isCompassOpen: $isCompassOpen,
                         selectedImageIndex: $selectedImageIndex,
                         dateTime: record.createdAt,
-                        images: images,
                         parkingRecord: record
                         
                     )
                 } else {
                     DetailRecordInactive()
                 }
-//                if !parkingRecords.isEmpty {
-//                    ForEach(parkingRecords) { parkingRecord in
-//                        if !parkingRecord.isHistory {
-//                            DetailRecordActive(
-//                                isPreviewOpen: $isPreviewOpen,
-//                                isCompassOpen: $isCompassOpen,
-//                                selectedImageIndex: $selectedImageIndex,
-//                                dateTime: parkingRecord.createdAt,
-//                                images: images,
-//                                parkingRecord: parkingRecord
-//                                
-//                            )
-//                        }
-//                    }
-//                } else {
-//                    DetailRecordInactive()
-//                }
+
             } header: {
                 Text("Detail Record")
                     .font(.title3)
@@ -75,14 +51,20 @@ struct DetailRecord: View {
                 }
             }
             .fullScreenCover(isPresented: $isCompassOpen) {
-                CompassView(
-                    isCompassOpen: $isCompassOpen
-                )
+
+                if let record = firstParkingRecord {
+                    CompassView(
+                        isCompassOpen: $isCompassOpen,
+                        selectedLocation: "Parking Location",
+                        longitude: record.longitude,
+                        latitude: record.latitude
+                    )
+                }
             }
         }
     }
 }
 
 #Preview {
-    DetailRecord()
+    ContentView()
 }
