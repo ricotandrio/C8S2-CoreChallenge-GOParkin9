@@ -10,8 +10,12 @@ import SwiftData
 
 @main
 struct GOParkin9App: App {
+
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     @State private var isSplashActive = true
     @AppStorage("openWelcomeView") var openWelcomeView: Bool = true
+
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([ParkingRecord.self]) // Register your model
@@ -49,20 +53,3 @@ struct GOParkin9App: App {
         }
     }
 }
-
-
-//@main
-//struct GOParkin9App: App {
-//    var sharedModelContainer: ModelContainer = {
-//        let schema = Schema([ParkingRecord.self]) // Register your model
-//        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-//        return try! ModelContainer(for: schema, configurations: [config])
-//    }()
-//
-//    var body: some Scene {
-//        WindowGroup {
-//            DetailRecord()
-//                .modelContainer(sharedModelContainer) // Attach model container
-//        }
-//    }
-//}

@@ -146,7 +146,7 @@ struct CompassView: View {
             Spacer()
             
             ZStack {
-                if formattedDistance.1 < 2 {
+                if formattedDistance.1 <= 5 {
                     Circle()
                         .fill(Color.white)
                         .frame(width: 150, height: 150)
