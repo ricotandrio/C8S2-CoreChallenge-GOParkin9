@@ -287,6 +287,8 @@ struct HistoryComponent: View {
                         .onTapGesture {
                             toggleSelection()
                         }
+
+                        .cornerRadius(5)
                 }
                 
                 if entry.images.isEmpty {
@@ -294,6 +296,7 @@ struct HistoryComponent: View {
                         .resizable()
                         .scaledToFill()
                         .frame(width: 60, height: 60)
+                        .cornerRadius(5)
                         .clipped()
                         .padding(.trailing, 10)
                 } else {
@@ -301,6 +304,7 @@ struct HistoryComponent: View {
                         .resizable()
                         .scaledToFill()
                         .frame(width: 60, height: 60)
+                        .cornerRadius(5)
                         .clipped()
                         .padding(.trailing, 10)
                 }
@@ -309,20 +313,25 @@ struct HistoryComponent: View {
                 VStack(alignment: .leading) {
                     Text(entry.createdAt, format: .dateTime.day().month().year())
                         .font(.headline)
-                        .padding(.vertical, 5)
+
+                        .padding(.vertical, 8)
                     
-                    HStack {
-                        Image(systemName: "arrow.down.backward.circle")
-                        Text(entry.createdAt, format: .dateTime.hour().minute())
+                    HStack() {
+                        HStack {
+                            Image(systemName: "arrow.down.backward.circle")
+                            Text(entry.createdAt, format: .dateTime.hour().minute())
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        Spacer()
-                        
-                        Image(systemName: "arrow.up.forward.circle")
-                        //                    if entry.completedAt.description.isEmpty {
-                        //                        Text(entry.createdAt, format: .dateTime.hour().minute())
-                        //                    } else {
-                        Text(entry.completedAt, format: .dateTime.hour().minute())
-                        //                    }
+                        HStack {
+                            Image(systemName: "arrow.up.forward.circle")
+                            //                    if entry.completedAt.description.isEmpty {
+                            //                        Text(entry.createdAt, format: .dateTime.hour().minute())
+                            //                    } else {
+                            Text(entry.completedAt, format: .dateTime.hour().minute())
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
                     }
                 }
                 
