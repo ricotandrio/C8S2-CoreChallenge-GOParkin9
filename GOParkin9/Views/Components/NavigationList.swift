@@ -20,9 +20,11 @@ struct NavigationList: View {
     @State var selectedNavigationName = ""
 
     let navigations = [
-        NavigationButton(name: "Entry Gate", icon: "pedestrian.gate.open"),
-        NavigationButton(name: "Exit Gate", icon: "pedestrian.gate.closed"),
+        NavigationButton(name: "Entry Gate B1", icon: "pedestrian.gate.open"),
+        NavigationButton(name: "Exit Gate B1", icon: "pedestrian.gate.closed"),
         NavigationButton(name: "Charging Station", icon: "bolt.car"),
+        NavigationButton(name: "Entry Gate B2", icon: "pedestrian.gate.open"),
+        NavigationButton(name: "Exit Gate B2", icon: "pedestrian.gate.closed"),
     ]
     
     var body: some View {
@@ -33,37 +35,37 @@ struct NavigationList: View {
                     .fontWeight(.bold)
                     .opacity(0.6)
             ) {
-                HStack(alignment: .top) {
-                    ForEach(navigations) { navigation in
+             
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .top, spacing: 20) {
+                        ForEach(navigations) { navigation in
+                            Button {
+                                selectedNavigationName = navigation.name
+                            } label: {
+                                VStack {
+                                    Image(systemName: navigation.icon)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 40, height: 40)
+                                        .foregroundColor(.blue)
+                                        .padding()
+                                        .background(Color.gray.opacity(0.2))
+                                        .cornerRadius(8)
+                                        .frame(width: 60, height: 60)
 
-                        Button {
-                            selectedNavigationName = navigation.name
-                        } label: {
-                            VStack {
-                                Image(systemName: navigation.icon)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 40, height: 40)
-                                    .foregroundColor(.blue)
-                                    .padding()
-                                    .background(Color.gray.opacity(0.2))
-                                    .cornerRadius(8)
-                                    .frame(width: 60, height: 60)
-                                
-                                Text(navigation.name)
-                                    .font(.caption)
-                                    .fontWeight(.bold)
-                                    .multilineTextAlignment(.center)
-                                    .frame(maxWidth: 60)
-                                    .padding(5)
-                                    .foregroundStyle(Color.black)
+                                    Text(navigation.name)
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .multilineTextAlignment(.center)
+                                        .frame(maxWidth: 60)
+                                        .padding(.top, 5)
+                                        .foregroundStyle(Color.black)
+                                }
+                                .contentShape(Rectangle())
                             }
-                            .contentShape(Rectangle())
                         }
-                        Spacer()
-                            .frame(width: 20)
-
                     }
+                    .padding()
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .onChange(of: selectedNavigationName) {
@@ -79,7 +81,6 @@ struct NavigationList: View {
                 }
             }
         }
-
     }
 }
 
