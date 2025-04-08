@@ -10,6 +10,9 @@ import SwiftData
 
 @main
 struct GOParkin9App: App {
+    @State private var isSplashActive = true
+    @AppStorage("openWelcomeView") var openWelcomeView: Bool = true
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([ParkingRecord.self]) // Register your model
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -18,10 +21,32 @@ struct GOParkin9App: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .modelContainer(sharedModelContainer)
+            if isSplashActive {
+                SplashScreenView()
+                    .onAppear {
+                        // Hide splash screen after 3 seconds (adjust as needed)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                            withAnimation {
+                                isSplashActive = false
+                            }
+                        }
+                    }
+            } else {
+//                if hasSeenWelcome {
+//                    ContentView()
+//                } else{
+//                    ContentView()
+//                        .modelContainer(sharedModelContainer)
+//                }
+                ContentView()
+                    .modelContainer(sharedModelContainer)
+                    .fullScreenCover(isPresented: $openWelcomeView) {
+
+                        WelcomeScreenView()
+                    }
+            }
+            //        .modelContainer(for: [ParkingRecord.self])
         }
-//        .modelContainer(for: [ParkingRecord.self])
     }
 }
 
