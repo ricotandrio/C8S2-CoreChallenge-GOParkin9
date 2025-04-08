@@ -23,7 +23,7 @@ struct SplashScreenView: View {
 
     var body: some View {
         ZStack {
-            Color.backgroundColor.ignoresSafeArea()
+            Color.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // MARK: 2 PNGs Merge
@@ -47,7 +47,7 @@ struct SplashScreenView: View {
                 // MARK: Text "GOParkin9"
                     Text("GOParkin9")
                         .font(.system(size: 30, weight: .bold))
-                        .foregroundColor(Color.secondaryColor3)
+                        .foregroundColor(Color.main)
                         .offset(y: showText ? 0 : -30)
                         .opacity(showText ? 1 : 0)
                         .animation(.easeInOut(duration: 0.6), value: showText)
