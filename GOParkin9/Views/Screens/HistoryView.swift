@@ -287,6 +287,7 @@ struct HistoryComponent: View {
                         .onTapGesture {
                             toggleSelection()
                         }
+
                         .cornerRadius(5)
                 }
                 
@@ -312,6 +313,7 @@ struct HistoryComponent: View {
                 VStack(alignment: .leading) {
                     Text(entry.createdAt, format: .dateTime.day().month().year())
                         .font(.headline)
+
                         .padding(.vertical, 8)
                     
                     HStack() {
@@ -329,7 +331,7 @@ struct HistoryComponent: View {
                             Text(entry.completedAt, format: .dateTime.hour().minute())
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        //                    }
+
                     }
                 }
                 

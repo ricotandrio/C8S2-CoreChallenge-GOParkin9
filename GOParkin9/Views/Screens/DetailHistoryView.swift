@@ -44,49 +44,6 @@ struct DetailHistoryView: View {
         VStack(spacing: 16) {
             // Image Slider
             ZStack {
-//                if parkingRecord.images.isEmpty {
-//                    Text("There's no image")
-//                        .foregroundColor(.red)
-//                        .font(.headline)
-//                } else {
-//                    Image(uiImage: parkingRecord.images[selectedImageIndex].getImage())
-//                        .resizable()
-//                        .scaledToFill()
-//                        .frame(maxHeight: 350)
-//                        .animation(.easeInOut, value: selectedImageIndex)
-//                        .clipped()
-//                        .cornerRadius(10)
-//                }
-//                
-//                HStack{
-//                    Color
-//                        .clear
-//                        .frame(width: UIScreen.main.bounds.width / 3, height: .infinity)
-//                        .contentShape(Rectangle())
-//                        .onTapGesture {
-//                            withAnimation {
-//                                selectedImageIndex = (selectedImageIndex - 1) == -1 ? parkingRecord.images.count - 1 : selectedImageIndex - 1
-//                            }
-//                        }
-//                    
-//                    Color
-//                        .clear
-//                        .frame(height: .infinity)
-//                        .contentShape(Rectangle())
-//                        .onTapGesture {
-//                            isPreviewOpen.toggle()
-//                        }
-//                    
-//                    Color
-//                        .clear
-//                        .frame(width: UIScreen.main.bounds.width / 3, height: .infinity)
-//                        .contentShape(Rectangle())
-//                        .onTapGesture {
-//                            withAnimation {
-//                                selectedImageIndex = (selectedImageIndex + 1) % parkingRecord.images.count
-//                            }
-//                        }
-//                }
                 
                 // Image Carousel with Swipe
                 if parkingRecord.images.isEmpty {
@@ -94,6 +51,7 @@ struct DetailHistoryView: View {
                         .foregroundColor(.red)
                         .font(.headline)
                 } else {
+
                     TabView(selection: $selectedImageIndex) {
                         ForEach(0..<parkingRecord.images.count, id: \.self) { index in
                             Image(uiImage: parkingRecord.images[index].getImage())
@@ -113,17 +71,6 @@ struct DetailHistoryView: View {
                 }
 
             }
-            
-//            HStack {
-//                ForEach(0..<parkingRecord.images.count, id: \.self) { index in
-//                    Circle()
-//                        .frame(width: 10, height: 10)
-//                        .foregroundColor(index == selectedImageIndex ? .blue : .gray.opacity(0.6))
-//                        .onTapGesture {
-//                            selectedImageIndex = index
-//                        }
-//                }
-//            }
             
             // Details
             VStack(alignment: .leading, spacing: 8) {
@@ -251,7 +198,7 @@ struct DetailHistoryView: View {
             .fullScreenCover(isPresented: $isCompassOpen) {
                 CompassView(
                     isCompassOpen: $isCompassOpen,
-                    selectedLocation: "Parking Location",
+                    selectedLocation: "Parking Location History",
                     longitude: parkingRecord.longitude,
                     latitude: parkingRecord.latitude
                 )
