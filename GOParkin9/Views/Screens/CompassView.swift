@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreLocation
+import SwiftData
 
 struct Location: Identifiable {
     let id = UUID()
@@ -24,10 +25,18 @@ struct CompassView: View {
     @State var longitude: Double
     @State var latitude: Double
     
+    @Query(filter: #Predicate<ParkingRecord>{p in p.isHistory == false}) var parkingRecords: [ParkingRecord]
+
+    var firstParkingRecord: ParkingRecord? {
+        parkingRecords.first
+    }
+    
     @State var options = [
-        Location(name: "Entry Gate", coordinate: CLLocationCoordinate2D(latitude: -6.2963229765925615, longitude: 106.64088135638036)),
-        Location(name: "Exit Gate", coordinate: CLLocationCoordinate2D(latitude: -6.2963229765925615, longitude: 106.64088135638036)),
-        Location(name: "Charging Station", coordinate: CLLocationCoordinate2D(latitude: -16.2963229765925615, longitude: 66.64088135638036))
+        Location(name: "Entry Gate B1", coordinate: CLLocationCoordinate2D(latitude: -6.302254, longitude: 106.652554)),
+        Location(name: "Exit Gate B1", coordinate: CLLocationCoordinate2D(latitude: -6.302244, longitude: 106.652582)),
+        Location(name: "Entry Gate B2", coordinate: CLLocationCoordinate2D(latitude: -6.301891, longitude: 106.652777)),
+        Location(name: "Exit Gate B2", coordinate: CLLocationCoordinate2D(latitude: -6.301597, longitude: 106.652761)),
+        Location(name: "Charging Station", coordinate: CLLocationCoordinate2D(latitude: -6.302097, longitude: 106.652612))
     ]
     
 
@@ -84,9 +93,12 @@ struct CompassView: View {
         }
     }
     
-    func appendLocation() {
-
-        if selectedLocation=="Parking Location" {
+    func appendLocationActiveParking() {
+        if let record = firstParkingRecord {
+            options.append(Location(name: "Parking Location", coordinate: CLLocationCoordinate2D(latitude: record.latitude, longitude: record.longitude)))
+        }
+        
+        if selectedLocation=="Parking Location History" {
             options.append(Location(name: selectedLocation, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)))
         }
     }
@@ -234,7 +246,8 @@ struct CompassView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.green)
         .onAppear {
-            appendLocation()
+//            appendLocation()
+            appendLocationActiveParking()
         }
     }
 }
