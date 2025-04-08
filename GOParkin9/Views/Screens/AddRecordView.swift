@@ -95,7 +95,7 @@ struct ModalView: View {
                     Button("OK") {
                     }
                 } message: {
-                    Text("You haven't save your parking location. Press the location button and make sure the position is accurate")
+                    Text("You haven't saved your parking location. Press the location button and make sure the position is accurate")
                 }
             }
             .padding()
