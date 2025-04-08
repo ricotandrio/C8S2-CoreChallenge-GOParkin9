@@ -29,6 +29,7 @@ struct FullscreenImageView: View {
 struct ModalView: View {
     @Environment(\.dismiss) var dismiss
     @State private var showingAlert = false
+    @State private var showingAlertSave = false
     @State private var showingCamera = false
     @State private var isImageFullscreen = false
     @State private var selectedImage: UIImage?
@@ -82,10 +83,19 @@ struct ModalView: View {
                             longitude: location.longitude,
                             images: images
                         )
+                        dismiss()
+                    } else {
+                        showingAlertSave.toggle()
                     }
-                    dismiss()
+                    
                 } label: {
                     Text("Done")
+                }
+                .alert("No Location Saved", isPresented: $showingAlertSave) {
+                    Button("OK") {
+                    }
+                } message: {
+                    Text("You haven't save your parking location. Press the location button and make sure the position is accurate")
                 }
             }
             .padding()
@@ -124,33 +134,37 @@ struct ModalView: View {
             VStack(alignment: .leading){
                 if let location = savedLocation {
                     Text("Location Saved!")
-                    Text("Latitude: \(location.latitude), Longitude: \(location.longitude)")
                 } else {
                     Text("Press the button to get your location.")
                         .padding()
-                    Button("Save my parking location") {
-                        showingAlert = true
+                    Button {
+                        showingAlert.toggle()
+                    } label: {
+                        HStack {
+                            Image(systemName: "mappin.and.ellipse")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 15)
+                            
+                            Text("Save my parking location")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .foregroundStyle(Color.white)
+                        .background(Color.blue)
+                        .cornerRadius(8)
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-//                    .buttonStyle(.borderedProminent)
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
                     .alert("Save Location", isPresented: $showingAlert) {
                         Button("Save") {
                             savedLocation = locationManager.location?.coordinate
                         }
                         Button("Cancel", role: .cancel) {}
                     } message: {
-                        Text("Once you save the location, you can't change it until it's complete.")
+                        Text("Once you save the location, you can't change it until you complete the navigation.")
                     }
                 }
-                
-//                if savedLocation == nil {
-//
-//                    
-//                }
                 Spacer()
             }.padding()
             
