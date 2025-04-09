@@ -23,12 +23,10 @@ struct DetailRecordActive: View {
         
         if parkingRecord.images.isEmpty {
             Text("There's no image")
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.vertical)
-                .foregroundStyle(Color.red)
-                .fontWeight(.bold)
-            
+                .foregroundColor(.red)
+                .font(.headline)
         } else {
+
             TabView(selection: $selectedImageIndex) {
                 ForEach(0..<parkingRecord.images.count, id: \.self) { index in
                     Image(uiImage: parkingRecord.images[index].getImage())

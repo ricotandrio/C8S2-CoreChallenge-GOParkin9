@@ -21,6 +21,25 @@ struct ImagePreviewView: View {
                 .onTapGesture {
                     isPresented = false
                 }
+            
+            VStack {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        isPresented = false
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(10)
+                            .background(Color.black.opacity(0.6))
+                            .clipShape(Circle())
+                            .shadow(radius: 5)
+                    }
+                }
+                .padding()
+                Spacer()
+            }
         }
     }
 }

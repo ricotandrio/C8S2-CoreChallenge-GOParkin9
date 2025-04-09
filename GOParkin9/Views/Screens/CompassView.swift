@@ -18,7 +18,7 @@ struct Location: Identifiable {
 
 struct CompassView: View {
     @StateObject var navigationManager = NavigationManager()
-    @State var isSpeechEnabled = true
+    @State var isSpeechEnabled = false
     
     @Binding var isCompassOpen: Bool
     
@@ -165,7 +165,7 @@ struct CompassView: View {
                 }
                 .pickerStyle(WheelPickerStyle())
                 .frame(height: 130)
-//                Text("\(option)")
+
             }
             .padding()
             
@@ -183,9 +183,10 @@ struct CompassView: View {
                             withAnimation(Animation.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
                                 isPulsing.toggle()
                             }
-                        }
-                        .onTapGesture {
-                            speak("You have arrived at \(selectedLocation)")
+                            
+                            if isSpeechEnabled {
+                                speechUtteranceManager.speak(text: "You have arrived at \(selectedLocation)")
+                            }
                         }
                 } else {
                     Image(systemName: "arrow.up")
@@ -197,9 +198,13 @@ struct CompassView: View {
 //                        .animation(.easeInOut(duration: 0.5), value: currentAngle)
                         .onChange(of: navigationManager.angle(to: targetDestination)) { newRawAngle in
                             updateDisplayedAngle(to: newRawAngle)
+                            
                         }
-                        .onTapGesture {
-                            speak("Turn to the \(clockDirection)")
+                        .onChange(of: clockDirection) {
+                            speechUtteranceManager.stopSpeaking()
+                            if isSpeechEnabled {
+                                speechUtteranceManager.speak(text: "Turn to the \(clockDirection)")
+                            }
                         }
                 }
             }
@@ -228,7 +233,7 @@ struct CompassView: View {
                     .foregroundColor(.white)
                     .fontWeight(.bold)
                 
-                Text("\(formattedDistance.0) to location)")
+                Text("\(formattedDistance.0) to location")
                     .font(.title3)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.white)
@@ -258,17 +263,16 @@ struct CompassView: View {
                 
                 Spacer()
                 
-                Text("Hold navigation arrow to activate speech")
-                    .multilineTextAlignment(.center)
-                    .font(.subheadline)
-                    .foregroundColor(.white)
-                    .fontWeight(.medium)
-                    .opacity(0.8)
-                
-                Spacer()
-                
                 Button {
-                    speechUtteranceManager.stopSpeaking()
+                    if isSpeechEnabled {
+                        speechUtteranceManager.stopSpeaking()
+                    } else {
+                        if formattedDistance.1 <= 5 {
+                            speechUtteranceManager.speak(text: "You have arrived at \(selectedLocation)")
+                        } else {
+                            speechUtteranceManager.speak(text: "Turn to the \(clockDirection)")
+                        }
+                    }
                     isSpeechEnabled.toggle()
                 } label: {
                     Image(systemName: isSpeechEnabled ? "speaker.wave.2" : "speaker.slash")

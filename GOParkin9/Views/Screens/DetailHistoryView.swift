@@ -70,7 +70,25 @@ struct DetailHistoryView: View {
                         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
                         .frame(height: 350)
                     }
-                    
+                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+                    .frame(height: 350)
+                }
+            }
+            
+            // Details
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    HStack {
+                        Image(systemName: "stairs")
+                        Text(parkingRecord.floor)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    Spacer()
+                    HStack {
+                        Image(systemName: "calendar")
+                        Text(parkingRecord.createdAt, format: .dateTime.day().month().year())
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
                 
                 //Details
