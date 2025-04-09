@@ -46,30 +46,11 @@ struct DetailHistoryView: View {
                 // Image Slider
                 ZStack {
                     
-                    // Image Carousel with Swipe
-                    if parkingRecord.images.isEmpty {
-                        Text("There's no image")
-                            .foregroundColor(.red)
-                            .font(.headline)
-                    } else {
-                        
-                        TabView(selection: $selectedImageIndex) {
-                            ForEach(0..<parkingRecord.images.count, id: \.self) { index in
-                                Image(uiImage: parkingRecord.images[index].getImage())
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(maxHeight: 350)
-                                    .clipped()
-                                    .cornerRadius(10)
-                                    .tag(index)
-                                    .onTapGesture {
-                                        isPreviewOpen = true
-                                    }
-                            }
-                        }
-                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-                        .frame(height: 350)
-                    }
+                    ParkingRecordImageView(
+                        parkingRecordImage: parkingRecord.images,
+                        isPreviewOpen: $isPreviewOpen,
+                        selectedImageIndex: $selectedImageIndex
+                    )
                 }
             }
             

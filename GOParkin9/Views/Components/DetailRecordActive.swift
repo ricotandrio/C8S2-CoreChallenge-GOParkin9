@@ -19,49 +19,25 @@ struct DetailRecordActive: View {
     @Binding var isComplete: Bool
     
     var body: some View {
-        //        Text(String(describing: parkingRecord.images))
         
-        if parkingRecord.images.isEmpty {
-            Text("There's no image")
-                .foregroundColor(.red)
-                .font(.headline)
-        } else {
-
-            TabView(selection: $selectedImageIndex) {
-                ForEach(0..<parkingRecord.images.count, id: \.self) { index in
-                    Image(uiImage: parkingRecord.images[index].getImage())
-                        .resizable()
-                        .scaledToFill()
-                        .frame(maxHeight: 250)
-                        .clipped()
-                        .cornerRadius(10)
-                        .tag(index)
-                        .onTapGesture {
-                            isPreviewOpen = true
-                        }
-                }
-            }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-            .frame(height: 250)
-            
-            Spacer()
-                .frame(height: 20)
-            Grid {
-                GridRow {
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Image(systemName: "calendar")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 20, height: 20)
-                                .opacity(0.6)
-                            
-                            Text("Date")
-                                .font(.subheadline)
-                                .fontWeight(.bold)
-                                .opacity(0.6)
-                            
-                        }
+        ParkingRecordImageView(
+            parkingRecordImage: parkingRecord.images,
+            isPreviewOpen: $isPreviewOpen,
+            selectedImageIndex: $selectedImageIndex
+        )
+        
+        Spacer()
+            .frame(height: 20)
+    
+        Grid {
+            GridRow {
+                VStack(alignment: .leading) {
+                    HStack {
+                        Image(systemName: "calendar")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .opacity(0.6)
                         
                         Text(dateTime, format: .dateTime.day().month().year())
                             .font(.subheadline)
