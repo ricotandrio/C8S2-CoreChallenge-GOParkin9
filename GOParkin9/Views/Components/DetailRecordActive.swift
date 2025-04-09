@@ -23,66 +23,27 @@ struct DetailRecordActive: View {
         
         if parkingRecord.images.isEmpty {
             Text("There's no image")
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.vertical)
-                .foregroundStyle(Color.red)
-                .fontWeight(.bold)
-            
+                .foregroundColor(.red)
+                .font(.headline)
         } else {
-            ZStack {
-                Image(uiImage: parkingRecord.images[selectedImageIndex].getImage())
-                    .resizable()
-                    .scaledToFill()
-                    .frame(maxHeight: 200)
-                    .animation(.easeInOut, value: selectedImageIndex)
-                    .clipped()
-                
-                HStack{
-                    Color
-                        .clear
-                        .frame(width: UIScreen.main.bounds.width / 3, height: .infinity)
-                        .contentShape(Rectangle())
+
+            TabView(selection: $selectedImageIndex) {
+                ForEach(0..<parkingRecord.images.count, id: \.self) { index in
+                    Image(uiImage: parkingRecord.images[index].getImage())
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxHeight: 350)
+                        .clipped()
+                        .cornerRadius(10)
+                        .tag(index)
                         .onTapGesture {
-                            withAnimation {
-                                selectedImageIndex = (selectedImageIndex - 1) == -1 ? parkingRecord.images.count - 1 : selectedImageIndex - 1
-                            }
-                        }
-                    
-                    Color
-                        .clear
-                        .frame(height: .infinity)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            isPreviewOpen.toggle()
-                        }
-                    
-                    Color
-                        .clear
-                        .frame(width: UIScreen.main.bounds.width / 3, height: .infinity)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            withAnimation {
-                                selectedImageIndex = (selectedImageIndex + 1) % parkingRecord.images.count
-                            }
+                            isPreviewOpen = true
                         }
                 }
             }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+            .frame(height: 350)
         }
-        
-        HStack {
-            ForEach(0..<parkingRecord.images.count, id: \.self) { index in
-                Circle()
-                    .frame(width: 10, height: 10)
-                    .foregroundColor(index == selectedImageIndex ? .blue : .gray.opacity(0.6))
-                    .onTapGesture {
-                        selectedImageIndex = index
-                    }
-            }
-            
-            
-        }
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.top, 8)
         
         Spacer()
             .frame(height: 20)
