@@ -8,20 +8,20 @@
 import SwiftUI
 
 struct NavigationButton: Identifiable {
-    let id: UUID = UUID()
+    let id: Int
     let name: String
     let icon: String
 }
 
 struct NavigationButtonList: View {
     let navigations: [NavigationButton]
-    @Binding var selectedNavigationName: String
+    @Binding var selectedNavigation: Int
     
     var body: some View {
         HStack(alignment: .top, spacing: 30) {
             ForEach(navigations) { navigation in
                 Button {
-                    selectedNavigationName = navigation.name
+                    selectedNavigation = navigation.id
                 } label: {
                     VStack {
                         Image(systemName: navigation.icon)
@@ -56,15 +56,15 @@ struct NavigationButtonList: View {
 struct NavigationList: View {
 
     @State var isCompassOpen: Bool = false
-    
-    @State var selectedNavigationName = ""
+    @State var showCompassView: Bool = false
+    @State var selectedNavigation:Int = 0
 
     let navigations = [
-        NavigationButton(name: "Entry Gate Basement 1", icon: "pedestrian.gate.open"),
-        NavigationButton(name: "Exit Gate Basemenet 1", icon: "pedestrian.gate.closed"),
-        NavigationButton(name: "Charging Station", icon: "bolt.car"),
-        NavigationButton(name: "Entry Gate Basement 2", icon: "pedestrian.gate.open"),
-        NavigationButton(name: "Exit Gate Basement 2", icon: "pedestrian.gate.closed"),
+        NavigationButton(id:1, name: "Entry Gate Basement 1", icon: "pedestrian.gate.open"),
+        NavigationButton(id:2, name: "Exit Gate Basement 1", icon: "pedestrian.gate.closed"),
+        NavigationButton(id:3, name: "Charging Station", icon: "bolt.car"),
+        NavigationButton(id:4, name: "Entry Gate Basement 2", icon: "pedestrian.gate.open"),
+        NavigationButton(id:5, name: "Exit Gate Basement 2", icon: "pedestrian.gate.closed"),
     ]
     
     var body: some View {
@@ -86,20 +86,30 @@ struct NavigationList: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     NavigationButtonList(
                         navigations: navigations,
-                        selectedNavigationName: $selectedNavigationName
+                        selectedNavigation: $selectedNavigation
                     )
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
-                .onChange(of: selectedNavigationName) {
+                .onChange(of: selectedNavigation) {
                     isCompassOpen.toggle()
+                    showCompassView = false
+                        
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        showCompassView = true
+                    }
                 }
                 .fullScreenCover(isPresented: $isCompassOpen) {
-                    CompassView(
-                        isCompassOpen: $isCompassOpen,
-                        selectedLocation: selectedNavigationName,
-                        longitude: 0,
-                        latitude: 0
-                    )
+                    if showCompassView {
+                        CompassView(
+                            isCompassOpen: $isCompassOpen,
+                            selectedLocation: selectedNavigation,
+                            longitude: 0,
+                            latitude: 0
+                        )
+                    } else {                        ProgressView("Loading...")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.black.opacity(0.4))
+                    }
                 }
             }
         }

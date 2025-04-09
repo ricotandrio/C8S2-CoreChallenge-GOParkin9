@@ -10,7 +10,7 @@ import CoreLocation
 import SwiftData
 
 struct Location: Identifiable {
-    let id = UUID()
+    let id: Int
     let name: String
     let label: String
     let coordinate: CLLocationCoordinate2D
@@ -22,7 +22,7 @@ struct CompassView: View {
     
     @Binding var isCompassOpen: Bool
     
-    @State var selectedLocation: String
+    @State var selectedLocation: Int
     @State var longitude: Double
     @State var latitude: Double
     
@@ -33,18 +33,18 @@ struct CompassView: View {
     }
     
     @State var options = [
-        Location(name: "Entry Gate B1", label: "Entry Gate Basement 1", coordinate: CLLocationCoordinate2D(latitude: -6.302254, longitude: 106.652554)),
-        Location(name: "Exit Gate B1", label: "Exit Gate Basement 1", coordinate: CLLocationCoordinate2D(latitude: -6.302244, longitude: 106.652582)),
-        Location(name: "Entry Gate B2", label: "Entry Gate Basement 2", coordinate: CLLocationCoordinate2D(latitude: -6.301891, longitude: 106.652777)),
-        Location(name: "Exit Gate B2", label: "Exit Gate Basement 2", coordinate: CLLocationCoordinate2D(latitude: -6.301597, longitude: 106.652761)),
-        Location(name: "Charging Station", label: "Charging Station", coordinate: CLLocationCoordinate2D(latitude: -6.302097, longitude: 106.652612))
+        Location(id:1, name: "Entry Gate B1", label: "Entry Gate Basement 1", coordinate: CLLocationCoordinate2D(latitude: -6.302254, longitude: 106.652554)),
+        Location(id:2, name: "Exit Gate B1", label: "Exit Gate Basement 1", coordinate: CLLocationCoordinate2D(latitude: -6.302244, longitude: 106.652582)),
+        Location(id:3, name: "Entry Gate B2", label: "Entry Gate Basement 2", coordinate: CLLocationCoordinate2D(latitude: -6.301891, longitude: 106.652777)),
+        Location(id:4, name: "Exit Gate B2", label: "Exit Gate Basement 2", coordinate: CLLocationCoordinate2D(latitude: -6.301597, longitude: 106.652761)),
+        Location(id:5, name: "Charging Station", label: "Charging Station", coordinate: CLLocationCoordinate2D(latitude: -6.302097, longitude: 106.652612))
     ]
     
     var speechUtteranceManager = SpeechUtteranceManager()
     
     var targetDestination: CLLocationCoordinate2D {
 
-        options.first(where: { $0.name == selectedLocation })?.coordinate ??
+        options.first(where: { $0.id == selectedLocation })?.coordinate ??
             CLLocationCoordinate2D(latitude: 0, longitude: 0)
 
     }
@@ -117,11 +117,11 @@ struct CompassView: View {
     
     func appendLocationActiveParking() {
         if let record = firstParkingRecord {
-            options.append(Location(name: "Parking Location", label: "Parking Location", coordinate: CLLocationCoordinate2D(latitude: record.latitude, longitude: record.longitude)))
+            options.append(Location(id:6 , name: "Parking Location", label: "Parking Location", coordinate: CLLocationCoordinate2D(latitude: record.latitude, longitude: record.longitude)))
         }
         
-        if selectedLocation=="Parking Location History" {
-            options.append(Location(name: selectedLocation, label: selectedLocation, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)))
+        if selectedLocation==7 {
+            options.append(Location(id:7, name: "Parking Location History", label: "Parking Location History", coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)))
         }
     }
     
@@ -155,8 +155,8 @@ struct CompassView: View {
                     .padding(.horizontal, 20)
                 
                 Picker("Select an option", selection: $selectedLocation) {
-                    ForEach(options, id: \.name) { option in
-                        Text(option.label)
+                    ForEach(options, id: \.id) { option in
+                        Text(option.label).tag(option.id)
                             .font(.title)
                             .foregroundColor(.white)
                             .fontWeight(.bold)
@@ -185,7 +185,9 @@ struct CompassView: View {
                             }
                             
                             if isSpeechEnabled {
-                                speechUtteranceManager.speak(text: "You have arrived at \(selectedLocation)")
+                                if let selected = options.first(where: { $0.id == selectedLocation }) {
+                                    speechUtteranceManager.speak(text: "You have arrived at \(selected.name)")
+                                }
                             }
                         }
                 } else {

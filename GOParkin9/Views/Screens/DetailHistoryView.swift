@@ -269,7 +269,7 @@ struct DetailHistoryView: View {
                 .fullScreenCover(isPresented: $isCompassOpen) {
                     CompassView(
                         isCompassOpen: $isCompassOpen,
-                        selectedLocation: "Parking Location History",
+                        selectedLocation: 7,
                         longitude: parkingRecord.longitude,
                         latitude: parkingRecord.latitude
                     )

@@ -89,7 +89,7 @@ struct DetailRecord: View {
                 if let record = firstParkingRecord {
                     CompassView(
                         isCompassOpen: $isCompassOpen,
-                        selectedLocation: "Parking Location",
+                        selectedLocation: 6,
                         longitude: record.longitude,
                         latitude: record.latitude
                     )
