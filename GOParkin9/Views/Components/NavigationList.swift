@@ -92,24 +92,15 @@ struct NavigationList: View {
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .onChange(of: selectedNavigation) {
                     isCompassOpen.toggle()
-                    showCompassView = false
-                        
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        showCompassView = true
-                    }
+                    showCompassView = true
                 }
                 .fullScreenCover(isPresented: $isCompassOpen) {
-                    if showCompassView {
                         CompassView(
                             isCompassOpen: $isCompassOpen,
                             selectedLocation: selectedNavigation,
                             longitude: 0,
                             latitude: 0
                         )
-                    } else {                        ProgressView("Loading...")
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color.black.opacity(0.4))
-                    }
                 }
             }
         }
