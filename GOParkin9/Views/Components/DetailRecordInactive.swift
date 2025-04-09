@@ -73,20 +73,20 @@ struct DetailRecordInactive: View {
             }
         }
         .alertComponent(
-                    isPresented: $showAlertSaveLocation,
-                    title: "Saving Location",
-                    message: "Are you sure you are in your parking spot?",
-                    confirmAction: {
-                        savedLocation = locationManager.location?.coordinate
-                    },
-                    cancelButtonText: "No",
-                    confirmButtonText: "Yes"
-                )
-                .onChange(of: savedLocation) { newValue in
-                    if newValue != nil {
-                        showingSheet = true
-                    }
-                }
+            isPresented: $showAlertSaveLocation,
+            title: "Saving Location",
+            message: "Are you sure you are in your parking spot?",
+            cancelButtonText: "No",
+            confirmAction: {
+                savedLocation = locationManager.location?.coordinate
+            },
+            confirmButtonText: "Yes"
+        )
+        .onChange(of: savedLocation) { newValue in
+            if newValue != nil {
+                showingSheet = true
+            }
+        }
         
     }
 }
