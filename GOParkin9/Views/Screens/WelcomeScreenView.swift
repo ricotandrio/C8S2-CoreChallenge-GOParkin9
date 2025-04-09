@@ -12,12 +12,12 @@ struct WelcomeScreenView: View {
     
     var body: some View {
         ZStack {
-            Color.backgroundColor.ignoresSafeArea()
+            Color.white.ignoresSafeArea()
 
             VStack(spacing: 30) {
                 // Welcome Text
                 Text("Welcome to")
-                    .foregroundStyle(Color.secondaryColor1)
+                    .foregroundStyle(Color.secondary1)
                     .font(.title)
                     .fontWeight(.bold)
 
@@ -29,7 +29,7 @@ struct WelcomeScreenView: View {
 
                 // App Name
                 Text("GOParkin9")
-                    .foregroundStyle(Color.secondaryColor3)
+                    .foregroundStyle(Color.main)
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding(.top, -20)
@@ -56,7 +56,7 @@ struct WelcomeScreenView: View {
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.secondaryColor3)
+                        .background(Color.green)
                         .cornerRadius(10)
                 }
                 .padding(.horizontal)
@@ -75,14 +75,14 @@ struct FeatureCircleView: View {
         VStack(spacing: 8) {
             ZStack {
                 Circle()
-                    .fill(Color.secondaryColor1.opacity(0.1))
+                    .fill(Color.gray.opacity(0.2))
                     .frame(width: 80, height: 80)
 
                 Image(systemName: icon)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 35, height: 35)
-                    .foregroundColor(Color.secondaryColor1)
+                    .foregroundColor(Color.blue)
             }
 
             Text(caption)

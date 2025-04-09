@@ -15,7 +15,7 @@ struct DetailRecordInactive: View {
         VStack(alignment: .center) {
             
             Spacer()
-                .frame(height: 100)
+                .frame(height: 80)
             
             Image(systemName: "parkingsign.radiowaves.left.and.right.slash")
                 .resizable()
@@ -23,12 +23,12 @@ struct DetailRecordInactive: View {
                 .frame(width: 100, height: 100)
                 .foregroundColor(Color.gray)
             
-            Text("There's no active parking record. Try to park your vehicle.")
-                .padding(.horizontal, 30)
-                .font(.subheadline)
-                .fontWeight(.bold)
-                .opacity(0.6)
-                .multilineTextAlignment(.center)
+//            Text("There's no active parking record. Try to park your vehicle.")
+//                .padding(.horizontal, 30)
+//                .font(.subheadline)
+//                .fontWeight(.bold)
+//                .opacity(0.6)
+//                .multilineTextAlignment(.center)
             
             Spacer()
                 .frame(height: 80)
