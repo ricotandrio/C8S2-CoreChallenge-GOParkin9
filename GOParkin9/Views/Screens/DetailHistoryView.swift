@@ -72,23 +72,9 @@ struct DetailHistoryView: View {
                     }
                 }
             }
+                Spacer()
+                    .frame(height: 20)
             
-            // Details
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    HStack {
-                        Image(systemName: "stairs")
-                        Text(parkingRecord.floor)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    Spacer()
-                    HStack {
-                        Image(systemName: "calendar")
-                        Text(parkingRecord.createdAt, format: .dateTime.day().month().year())
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                }
-                
                 //Details
                 Grid {
                     GridRow {
@@ -132,7 +118,10 @@ struct DetailHistoryView: View {
                         }
                     }.frame(maxWidth: .infinity, alignment: .leading)
                 }
-                
+            
+                Spacer()
+                    .frame(height: 20)
+            
                 Grid {
                     GridRow {
                         VStack(alignment: .leading) {
@@ -176,6 +165,9 @@ struct DetailHistoryView: View {
                     }.frame(maxWidth: .infinity, alignment: .leading)
                 }
                 
+                Spacer()
+                    .frame(height: 20)
+            
                 // Button
                 Button {
                     print("Navigate Back")
@@ -198,6 +190,9 @@ struct DetailHistoryView: View {
                     .cornerRadius(10)
                 }
                 
+                Spacer()
+                    .frame(height: 15)
+            
                 HStack {
                     Button(action: {
                         selectedHistoryToBeDeleted = parkingRecord
@@ -219,6 +214,9 @@ struct DetailHistoryView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                     }
+                    
+                    Spacer()
+                        .frame(width: 15)
                     
                     Button(action: {
                         pinItem(parkingRecord)
@@ -269,7 +267,7 @@ struct DetailHistoryView: View {
                 .fullScreenCover(isPresented: $isCompassOpen) {
                     CompassView(
                         isCompassOpen: $isCompassOpen,
-                        selectedLocation: "Parking Location History",
+                        selectedLocation: 7,
                         longitude: parkingRecord.longitude,
                         latitude: parkingRecord.latitude
                     )
@@ -277,7 +275,7 @@ struct DetailHistoryView: View {
                 }
         }
     }
-}
+
 
 //
 //struct HistoryDetailView: View {
