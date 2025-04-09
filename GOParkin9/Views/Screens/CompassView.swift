@@ -12,6 +12,7 @@ import SwiftData
 struct Location: Identifiable {
     let id = UUID()
     let name: String
+    let label: String
     let coordinate: CLLocationCoordinate2D
 }
 
@@ -32,14 +33,12 @@ struct CompassView: View {
     }
     
     @State var options = [
-        Location(name: "Entry Gate B1", coordinate: CLLocationCoordinate2D(latitude: -6.302254, longitude: 106.652554)),
-        Location(name: "Exit Gate B1", coordinate: CLLocationCoordinate2D(latitude: -6.302244, longitude: 106.652582)),
-        Location(name: "Entry Gate B2", coordinate: CLLocationCoordinate2D(latitude: -6.301891, longitude: 106.652777)),
-        Location(name: "Exit Gate B2", coordinate: CLLocationCoordinate2D(latitude: -6.301597, longitude: 106.652761)),
-        Location(name: "Charging Station", coordinate: CLLocationCoordinate2D(latitude: -6.302097, longitude: 106.652612))
+        Location(name: "Entry Gate B1", label: "Entry Gate Basement 1", coordinate: CLLocationCoordinate2D(latitude: -6.302254, longitude: 106.652554)),
+        Location(name: "Exit Gate B1", label: "Exit Gate Basement 1", coordinate: CLLocationCoordinate2D(latitude: -6.302244, longitude: 106.652582)),
+        Location(name: "Entry Gate B2", label: "Entry Gate Basement 2", coordinate: CLLocationCoordinate2D(latitude: -6.301891, longitude: 106.652777)),
+        Location(name: "Exit Gate B2", label: "Exit Gate Basement 2", coordinate: CLLocationCoordinate2D(latitude: -6.301597, longitude: 106.652761)),
+        Location(name: "Charging Station", label: "Charging Station", coordinate: CLLocationCoordinate2D(latitude: -6.302097, longitude: 106.652612))
     ]
-    
-
     
     var speechUtteranceManager = SpeechUtteranceManager()
     
@@ -52,6 +51,29 @@ struct CompassView: View {
     
     var currentAngle: Double {
         navigationManager.angle(to: targetDestination)
+    }
+    
+    @State var previousAngle: Double = 0
+    @State var displayedAngle: Double = 0
+    
+    private func updateDisplayedAngle(to newAngle: Double) {
+        let normalizedNew = newAngle.truncatingRemainder(dividingBy: 360)
+        let normalizedPrev = previousAngle.truncatingRemainder(dividingBy: 360)
+
+        var delta = normalizedNew - normalizedPrev
+        if delta > 180 {
+            delta -= 360
+        } else if delta < -180 {
+            delta += 360
+        }
+
+        let smoothedAngle = displayedAngle + delta
+
+        withAnimation(.easeInOut(duration: 0.4)) {
+            displayedAngle = smoothedAngle
+        }
+
+        previousAngle = normalizedNew
     }
     
     var clockDirection: String {
@@ -95,11 +117,11 @@ struct CompassView: View {
     
     func appendLocationActiveParking() {
         if let record = firstParkingRecord {
-            options.append(Location(name: "Parking Location", coordinate: CLLocationCoordinate2D(latitude: record.latitude, longitude: record.longitude)))
+            options.append(Location(name: "Parking Location", label: "Parking Location", coordinate: CLLocationCoordinate2D(latitude: record.latitude, longitude: record.longitude)))
         }
         
         if selectedLocation=="Parking Location History" {
-            options.append(Location(name: selectedLocation, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)))
+            options.append(Location(name: selectedLocation, label: selectedLocation, coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)))
         }
     }
     
@@ -119,26 +141,30 @@ struct CompassView: View {
         
         VStack {
             VStack {
-                Text("NAVIGATE TO")
-                    .font(.headline)
+                Text("Navigate to")
+                    .font(.title3)
                     .foregroundColor(.white)
                     .fontWeight(.bold)
                     .opacity(0.7)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.bottom, -10)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.bottom, 10)
+                
+                Divider()
+                    .frame(height: 1)
+                    .background(Color.white.opacity(0.5))
+                    .padding(.horizontal, 20)
                 
                 Picker("Select an option", selection: $selectedLocation) {
                     ForEach(options, id: \.name) { option in
-                        Text(option.name)
+                        Text(option.label)
                             .font(.title)
                             .foregroundColor(.white)
                             .fontWeight(.bold)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
                 .pickerStyle(WheelPickerStyle())
-                .frame(height: 80)
-                .padding(.leading, -10)
+                .frame(height: 130)
 //                Text("\(option)")
             }
             .padding()
@@ -146,7 +172,7 @@ struct CompassView: View {
             Spacer()
             
             ZStack {
-                if formattedDistance.1 < 2 {
+                if formattedDistance.1 <= 5 {
                     Circle()
                         .fill(Color.white)
                         .frame(width: 150, height: 150)
@@ -167,8 +193,11 @@ struct CompassView: View {
                         .scaledToFit()
                         .frame(width: 150, height: 200)
                         .foregroundColor(Color.white)
-                        .rotationEffect(.degrees(currentAngle))
-                        .animation(.easeInOut(duration: 0.5), value: currentAngle)
+                        .rotationEffect(.degrees(displayedAngle))
+//                        .animation(.easeInOut(duration: 0.5), value: currentAngle)
+                        .onChange(of: navigationManager.angle(to: targetDestination)) { newRawAngle in
+                            updateDisplayedAngle(to: newRawAngle)
+                        }
                         .onTapGesture {
                             speak("Turn to the \(clockDirection)")
                         }
@@ -178,26 +207,30 @@ struct CompassView: View {
             
             Spacer()
 
-            if formattedDistance.1 < 2 {
+            if formattedDistance.1 <= 5 {
                 Text("Check nearby vehicle in the area")
-                    .font(.headline)
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
                     .foregroundColor(.white)
                     .fontWeight(.bold)
                 
-                Text("You have arrived at \(selectedLocation)")
-                    .font(.headline)
+                Text("You have arrived at location")
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
                     .foregroundColor(.white)
                     .fontWeight(.medium)
                     .opacity(0.8)
                 
             } else {
                 Text("Turn to the \(clockDirection)")
-                    .font(.headline)
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
                     .foregroundColor(.white)
                     .fontWeight(.bold)
                 
-                Text("\(formattedDistance.0) to \(selectedLocation)")
-                    .font(.headline)
+                Text("\(formattedDistance.0) to location)")
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
                     .foregroundColor(.white)
                     .fontWeight(.medium)
                     .opacity(0.8)
@@ -225,6 +258,15 @@ struct CompassView: View {
                 
                 Spacer()
                 
+                Text("Hold navigation arrow to activate speech")
+                    .multilineTextAlignment(.center)
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+                    .fontWeight(.medium)
+                    .opacity(0.8)
+                
+                Spacer()
+                
                 Button {
                     speechUtteranceManager.stopSpeaking()
                     isSpeechEnabled.toggle()
@@ -244,7 +286,7 @@ struct CompassView: View {
             .padding()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.green)
+        .background(Color.highlight2)
         .onAppear {
 //            appendLocation()
             appendLocationActiveParking()
