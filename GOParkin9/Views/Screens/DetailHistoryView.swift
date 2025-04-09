@@ -70,8 +70,6 @@ struct DetailHistoryView: View {
                         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
                         .frame(height: 350)
                     }
-                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-                    .frame(height: 350)
                 }
             }
             
