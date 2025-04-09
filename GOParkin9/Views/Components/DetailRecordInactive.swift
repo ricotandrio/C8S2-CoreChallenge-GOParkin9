@@ -55,7 +55,7 @@ struct DetailRecordInactive: View {
                         .scaledToFit()
                         .frame(height: 15)
                     
-                    Text("Park Now")
+                    Text("Mark This Spot")
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
