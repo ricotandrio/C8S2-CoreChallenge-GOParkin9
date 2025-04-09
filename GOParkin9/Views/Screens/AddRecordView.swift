@@ -9,22 +9,6 @@ import CoreLocation
 import CoreLocationUI
 import SwiftData
 
-struct FullscreenImageView: View {
-    var image: UIImage
-    @Binding var isPresented: Bool
-
-    var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFit()
-                .onTapGesture {
-                    isPresented = false
-                }
-        }
-    }
-}
 
 struct ModalView: View {
     @Environment(\.dismiss) var dismiss
@@ -33,23 +17,22 @@ struct ModalView: View {
     @State private var showingCamera = false
     @State private var isImageFullscreen = false
     @State private var selectedImage: UIImage?
-    @State private var selectedFloor = "Basement 1"
+    @State private var selectedFloor: String? = nil
     @State private var floors = ["Basement 1", "Basement 2"]
     let dateTime = Date.now
 
-    let locationManager = NavigationManager()
-    @State private var savedLocation: CLLocationCoordinate2D?
+    let savedLocation:CLLocationCoordinate2D
     
     @Environment(\.modelContext) var context
 
-    func addParkingRecord(latitude: Double, longitude: Double, images: [UIImage]) {
+    func addParkingRecord(latitude: Double, longitude: Double, images: [UIImage], floor:String) {
         let convertedImages = images.map { ParkingImage(image: $0) }
         
         let record = ParkingRecord(
             latitude: latitude,
             longitude: longitude,
             isHistory: false,
-            floor: selectedFloor,
+            floor: floor,
             createdAt: dateTime,
             images: convertedImages
         )
@@ -71,17 +54,18 @@ struct ModalView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Button("Dismiss") {
+                Button("Cancel") {
                     dismiss()
                 }
                 Spacer()
                 Button {
-                    if let location = savedLocation {
+                    if let selected = selectedFloor {
                         print("Button clicked")
                         addParkingRecord(
-                            latitude: location.latitude,
-                            longitude: location.longitude,
-                            images: images
+                            latitude: savedLocation.latitude,
+                            longitude: savedLocation.longitude,
+                            images: images,
+                            floor: selected
                         )
                         dismiss()
                     } else {
@@ -91,97 +75,82 @@ struct ModalView: View {
                 } label: {
                     Text("Done")
                 }
-                .alert("No Location Saved", isPresented: $showingAlertSave) {
+                .alert("Floor haven't selected", isPresented: $showingAlertSave) {
                     Button("OK") {
                     }
                 } message: {
-                    Text("You haven't save your parking location. Press the location button and make sure the position is accurate")
+                    Text("Please select a floor where you parked your vehicle.")
                 }
             }
             .padding()
             
-            if(images.isEmpty) {
-                Text("Add up to 8 photos or videos of your parking area environment")
-                    .padding()
-            }
-            
-            
-            GridView(images: $images, isImageFullscreen: $isImageFullscreen, selectedImage: $selectedImage)
-            Grid {
-                GridRow {
+            VStack(alignment: .leading){
+                    HStack {
+                        Image(systemName: "mappin.and.ellipse")
+                        Text("Location saved!")
+                    }.padding(.bottom)
                     HStack {
                         Image(systemName: "calendar")
                         Text(dateTime, format: .dateTime.day().month().year())
-                    }
+                    }.padding(.bottom)
                     
                     HStack {
                         Image(systemName: "clock")
                         Text(dateTime, format: .dateTime.hour().minute())
                     }
-                }.frame(maxWidth: .infinity, alignment: .leading)
-            }.padding()
-            HStack {
-                Image(systemName: "stairs")
-                Picker("Floor", selection: $selectedFloor) {
-                    ForEach(floors, id: \.self) { floor in
-                        Text(floor)
+                    HStack {
+                        Image(systemName: "stairs")
+                        Picker("On which floor is your vehicle parked?", selection: $selectedFloor) {
+                            Text("Please select your parking floor").tag(nil as String?)
+                            ForEach(floors, id: \.self) { floor in
+                                Text(floor).tag(floor as String?)
+                            }
+                        }.pickerStyle(.menu)
                     }
-                }
-                .pickerStyle(.segmented)
-            }.padding()
-            
-
-            VStack(alignment: .leading){
-                if let location = savedLocation {
-                    Text("Location Saved!")
-                } else {
-                    Text("Press the button to get your location.")
-                        .padding()
-                    Button {
-                        showingAlert.toggle()
-                    } label: {
-                        HStack {
-                            Image(systemName: "mappin.and.ellipse")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 15)
-                            
-                            Text("Save my parking location")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .foregroundStyle(Color.white)
-                        .background(Color.blue)
-                        .cornerRadius(8)
-                    }
-                    .alert("Save Location", isPresented: $showingAlert) {
-                        Button("Save") {
-                            savedLocation = locationManager.location?.coordinate
-                        }
-                        Button("Cancel", role: .cancel) {}
-                    } message: {
-                        Text("Once you save the location, you can't change it until you complete the navigation.")
-                    }
-                }
+                Text("Take up to 8 photos of your parking spot environment")
+                    .padding(.vertical)
+                GridView(images: $images, onSelectImage: { img in
+                    selectedImage = img
+                    isImageFullscreen = true
+                }, isImageFullscreen: $isImageFullscreen)
                 Spacer()
             }.padding()
-            
             Spacer()
         }
-        .sheet(isPresented: $isImageFullscreen) {
+        .fullScreenCover(
+            isPresented: Binding(
+                get: { isImageFullscreen && selectedImage != nil },
+                set: { isImageFullscreen = $0 }
+            )
+        ) {
             if let selectedImage = selectedImage {
-                FullscreenImageView(image: selectedImage, isPresented: $isImageFullscreen)
+                ImagePreviewView(imageName: selectedImage, isPresented: $isImageFullscreen)
+            } else {
+                Text("Image not found").foregroundColor(.white)
             }
+        }
+    }
+        
+}
+
+struct ImagePreviewWrapper: View {
+    var selectedImage: UIImage?
+    @Binding var isPresented: Bool
+    
+    var body: some View {
+        if let selectedImage {
+            ImagePreviewView(imageName: selectedImage, isPresented: $isPresented)
+        } else {
+            Text("Image not found").foregroundColor(.white)
         }
     }
 }
 
 struct GridView: View {
     @Binding var images: [UIImage]
+    var onSelectImage: (UIImage) -> Void
     @Binding var isImageFullscreen: Bool
-    @Binding var selectedImage: UIImage?
+//    @Binding var selectedImage: UIImage?
     
     @State private var showingCamera = false
     @State private var newImage: UIImage?
@@ -196,19 +165,20 @@ struct GridView: View {
                     .clipped()
                     .cornerRadius(8)
                     .onTapGesture {
-                        selectedImage = images[img]
-                        isImageFullscreen = true
+                        onSelectImage(images[img])
+//                        isImageFullscreen.toggle()
                     }
                     .overlay(
                         Button(action: {
                             images.remove(at: img)
                         }) {
-                            RoundedRectangle(cornerRadius: 30)
-                                .frame(width: 20, height: 20)
-                                .foregroundColor(Color.red)
-                                .overlay(
-                                    Text("x").foregroundColor(.white)
-                                )
+                            Image(systemName: "xmark")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(5)
+                                .background(Color.red)
+                                .clipShape(Circle())
+                                .shadow(radius: 5)
                         }
                         .offset(x: -35, y: -35)
                     )
@@ -224,6 +194,7 @@ struct GridView: View {
                         .cornerRadius(8)
                         .overlay(
                             Text("+").foregroundColor(.blue)
+                                .font(.system(size: 35))
                         )
                 }
                 .fullScreenCover(isPresented: $showingCamera) {
@@ -239,6 +210,7 @@ struct GridView: View {
             }
         }
         .padding()
+        
     }
 }
 
