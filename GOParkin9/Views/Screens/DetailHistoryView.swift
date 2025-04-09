@@ -51,6 +51,8 @@ struct DetailHistoryView: View {
                         Text("There's no image")
                             .foregroundColor(.red)
                             .font(.headline)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding()
                     } else {
                         
                         TabView(selection: $selectedImageIndex) {
@@ -253,7 +255,8 @@ struct DetailHistoryView: View {
                         dismiss()
                     }
                 },
-                confirmButtonText: "Delete"
+                confirmButtonText: "Delete",
+                confirmButtonRole: .destructive
             )
             .fullScreenCover(isPresented: $isPreviewOpen) {
                 
