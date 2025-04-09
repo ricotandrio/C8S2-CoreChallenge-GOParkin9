@@ -44,14 +44,12 @@ struct DetailHistoryView: View {
         VStack(spacing: 16) {
             // Image Slider
             ZStack {
-                
                 // Image Carousel with Swipe
                 if parkingRecord.images.isEmpty {
                     Text("There's no image")
                         .foregroundColor(.red)
                         .font(.headline)
                 } else {
-
                     TabView(selection: $selectedImageIndex) {
                         ForEach(0..<parkingRecord.images.count, id: \.self) { index in
                             Image(uiImage: parkingRecord.images[index].getImage())
@@ -69,7 +67,6 @@ struct DetailHistoryView: View {
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
                     .frame(height: 350)
                 }
-
             }
             
             // Details
