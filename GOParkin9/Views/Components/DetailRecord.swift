@@ -51,10 +51,26 @@ struct DetailRecord: View {
                 }
 
             } header: {
-                Text("Detail Record")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .opacity(0.6)
+                VStack(alignment: .leading) {
+                    Text("Currently Parked")
+                        .font(.title3)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    if let _ = firstParkingRecord {
+                        Text("Details of your parking activity")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.secondary)
+                    } else {
+                        Text("There's no record of your parking activity")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.secondary)
+                        
+                    }
+                }
+                .padding(.vertical)
             }
             .alertComponent(
                 isPresented: $isComplete,

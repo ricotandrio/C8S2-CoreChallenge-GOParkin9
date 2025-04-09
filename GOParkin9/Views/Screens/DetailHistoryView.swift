@@ -41,28 +41,34 @@ struct DetailHistoryView: View {
     @State private var selectedHistoryToBePinned: ParkingRecord?
     
     var body: some View {
-        VStack(spacing: 16) {
-            // Image Slider
-            ZStack {
-                // Image Carousel with Swipe
-                if parkingRecord.images.isEmpty {
-                    Text("There's no image")
-                        .foregroundColor(.red)
-                        .font(.headline)
-                } else {
-                    TabView(selection: $selectedImageIndex) {
-                        ForEach(0..<parkingRecord.images.count, id: \.self) { index in
-                            Image(uiImage: parkingRecord.images[index].getImage())
-                                .resizable()
-                                .scaledToFill()
-                                .frame(maxHeight: 350)
-                                .clipped()
-                                .cornerRadius(10)
-                                .tag(index)
-                                .onTapGesture {
-                                    isPreviewOpen = true
-                                }
+        ScrollView {
+            VStack(spacing: 16) {
+                // Image Slider
+                ZStack {
+                    
+                    // Image Carousel with Swipe
+                    if parkingRecord.images.isEmpty {
+                        Text("There's no image")
+                            .foregroundColor(.red)
+                            .font(.headline)
+                    } else {
+                        
+                        TabView(selection: $selectedImageIndex) {
+                            ForEach(0..<parkingRecord.images.count, id: \.self) { index in
+                                Image(uiImage: parkingRecord.images[index].getImage())
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(maxHeight: 350)
+                                    .clipped()
+                                    .cornerRadius(10)
+                                    .tag(index)
+                                    .onTapGesture {
+                                        isPreviewOpen = true
+                                    }
+                            }
                         }
+                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+                        .frame(height: 350)
                     }
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
                     .frame(height: 350)
@@ -84,122 +90,194 @@ struct DetailHistoryView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                .padding(5)
-                HStack {
-                    HStack {
-                        Image(systemName:"arrow.down.backward.circle")
-                        Text(parkingRecord.createdAt, format: .dateTime.hour().minute())
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    Spacer()
-                    HStack {
-                        Image(systemName:"arrow.up.forward.circle")
-                        Text(parkingRecord.completedAt, format: .dateTime.hour().minute())
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
+                
+                //Details
+                Grid {
+                    GridRow {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Image(systemName: "calendar")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 20)
+                                    .opacity(0.6)
+                                
+                                Text("Date")
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                                    .opacity(0.6)
+                                
+                            }
+                            
+                            Text(parkingRecord.createdAt, format: .dateTime.day().month().year())
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Image(systemName: "map")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 20)
+                                    .opacity(0.6)
+                                
+                                Text("Location")
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                                    .opacity(0.6)
+                                
+                            }
+                            
+                            Text("GOP 9, \(parkingRecord.floor)")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                    }.frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(5)
-            }
-            .padding()
-            
-            // Button
-            Button {
-                print("Navigate Back")
-                isCompassOpen.toggle()
-            } label: {
-                HStack {
-                    Image(systemName: "figure.walk")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 15)
-                    
-                    Text("Navigate Back")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
+                
+                Grid {
+                    GridRow {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Image(systemName: "arrow.down.backward.circle")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 20)
+                                    .opacity(0.6)
+                                
+                                Text("Clock in")
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                                    .opacity(0.6)
+                                
+                            }
+                            
+                            Text(parkingRecord.createdAt, format: .dateTime.hour().minute())
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Image(systemName: "arrow.up.forward.circle")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 20)
+                                    .opacity(0.6)
+                                
+                                Text("Clock out")
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                                    .opacity(0.6)
+                                
+                            }
+                            
+                            Text(parkingRecord.completedAt, format: .dateTime.hour().minute())
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                    }.frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(10)
-            }
-            
-            HStack {
-                Button(action: {
-                    selectedHistoryToBeDeleted = parkingRecord
-                    isDeleteConfirmationAlertOpen.toggle()
-                }) {
+                
+                // Button
+                Button {
+                    print("Navigate Back")
+                    isCompassOpen.toggle()
+                } label: {
                     HStack {
-                        Image(systemName: "trash")
+                        Image(systemName: "figure.walk")
                             .resizable()
                             .scaledToFit()
                             .frame(height: 15)
                         
-                        Text("Delete")
+                        Text("Navigate Back")
                             .font(.subheadline)
                             .fontWeight(.medium)
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.red)
+                    .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(10)
                 }
                 
-                Button(action: {
-                    pinItem(parkingRecord)
-                    dismiss()
-                }) {
-                    HStack {
-                        Image(systemName: parkingRecord.isPinned ? "pin.slash" : "pin")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 15)
-
-                        Text(parkingRecord.isPinned ? "Unpin History" : "Pin History")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
+                HStack {
+                    Button(action: {
+                        selectedHistoryToBeDeleted = parkingRecord
+                        isDeleteConfirmationAlertOpen.toggle()
+                    }) {
+                        HStack {
+                            Image(systemName: "trash")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 15)
+                            
+                            Text("Delete")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.yellow)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
+                    
+                    Button(action: {
+                        pinItem(parkingRecord)
+                        dismiss()
+                    }) {
+                        HStack {
+                            Image(systemName: parkingRecord.isPinned ? "pin.slash" : "pin")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 15)
+                            
+                            Text(parkingRecord.isPinned ? "Unpin History" : "Pin History")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.yellow)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
                 }
             }
-        }
-        .padding()
-        .navigationTitle("\(parkingRecord.createdAt, format: .dateTime.day().month().year())")
-        .navigationBarTitleDisplayMode(.inline)
-        .alertComponent(
-            isPresented: $isDeleteConfirmationAlertOpen,
-            title: "Delete This Record?",
-            message: "This action cannot be undone.",
-            confirmAction: {
-                if let record = selectedHistoryToBeDeleted {
-                    deleteItem(record)
-                    dismiss()
-                }
-            },
-            confirmButtonText: "Delete"
-        )
-        .fullScreenCover(isPresented: $isPreviewOpen) {
-            
+            .padding()
+            .navigationTitle("\(parkingRecord.createdAt, format: .dateTime.day().month().year())")
+            .navigationBarTitleDisplayMode(.inline)
+            .alertComponent(
+                isPresented: $isDeleteConfirmationAlertOpen,
+                title: "Delete This Record?",
+                message: "This action cannot be undone.",
+                confirmAction: {
+                    if let record = selectedHistoryToBeDeleted {
+                        deleteItem(record)
+                        dismiss()
+                    }
+                },
+                confirmButtonText: "Delete"
+            )
+            .fullScreenCover(isPresented: $isPreviewOpen) {
+                
                 ImagePreviewView(
                     imageName: parkingRecord.images[selectedImageIndex].getImage(),
                     isPresented: $isPreviewOpen
                 )
-            
-        }
-        Spacer()
-            .fullScreenCover(isPresented: $isCompassOpen) {
-                CompassView(
-                    isCompassOpen: $isCompassOpen,
-                    selectedLocation: "Parking Location History",
-                    longitude: parkingRecord.longitude,
-                    latitude: parkingRecord.latitude
-                )
+                
             }
+            Spacer()
+                .fullScreenCover(isPresented: $isCompassOpen) {
+                    CompassView(
+                        isCompassOpen: $isCompassOpen,
+                        selectedLocation: "Parking Location History",
+                        longitude: parkingRecord.longitude,
+                        latitude: parkingRecord.latitude
+                    )
+                    
+                }
+        }
     }
 }
 
