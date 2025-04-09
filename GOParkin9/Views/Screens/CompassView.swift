@@ -292,7 +292,7 @@ struct CompassView: View {
             .padding()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.green)
+        .background(Color.secondary3)
         .onAppear {
 //            appendLocation()
             appendLocationActiveParking()
