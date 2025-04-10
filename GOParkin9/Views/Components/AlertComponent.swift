@@ -15,30 +15,37 @@ struct AlertComponent: ViewModifier {
     let cancelAction: (() -> Void)?
     let cancelButtonText: String
     let cancelButtonRole: ButtonRole?
+    let hideCancelButton: Bool
     
     let confirmAction: (() -> Void)?
     let confirmButtonText: String
     let confirmButtonRole: ButtonRole?
+    let hideConfirmButton: Bool
     
     func body(content: Content) -> some View {
         content
             .alert(title, isPresented: $isPresented) {
                 
-                Button(role: cancelButtonRole) {
-                    if let _ = cancelAction {
-                        cancelAction?()
+                if !hideCancelButton {
+                    
+                    Button(role: cancelButtonRole) {
+                        if let _ = cancelAction {
+                            cancelAction?()
+                        }
+                    } label: {
+                        Text(cancelButtonText)
                     }
-                } label: {
-                    Text(cancelButtonText)
                 }
                 
-                
-                Button(role: confirmButtonRole) {
-                    if let _ = confirmAction {
-                        confirmAction?()
+                if !hideConfirmButton {
+                    
+                    Button(role: confirmButtonRole) {
+                        if let _ = confirmAction {
+                            confirmAction?()
+                        }
+                    } label: {
+                        Text(confirmButtonText)
                     }
-                } label: {
-                    Text(confirmButtonText)
                 }
             } message: {
                 Text(message)
@@ -55,10 +62,13 @@ extension View {
         cancelAction: (() -> Void)? = nil,
         cancelButtonText: String = "Cancel",
         cancelButtonRole: ButtonRole = .cancel,
+        hideCancelButton: Bool = false,
         
         confirmAction: (() -> Void)? = nil,
         confirmButtonText: String = "Confirm",
-        confirmButtonRole: ButtonRole? = nil
+        confirmButtonRole: ButtonRole? = nil,
+        hideConfirmButton: Bool = false
+        
     ) -> some View {
         self.modifier(
             AlertComponent(
@@ -69,10 +79,12 @@ extension View {
                 cancelAction: cancelAction,
                 cancelButtonText: cancelButtonText,
                 cancelButtonRole: cancelButtonRole,
+                hideCancelButton: hideCancelButton,
                 
                 confirmAction: confirmAction,
                 confirmButtonText: confirmButtonText,
-                confirmButtonRole: confirmButtonRole
+                confirmButtonRole: confirmButtonRole,
+                hideConfirmButton: hideConfirmButton
             )
         )
     }
