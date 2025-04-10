@@ -77,7 +77,8 @@ struct DetailRecord: View {
                 title: "Complete this record?",
                 message: "This action cannot be undone.",
                 confirmAction: complete,
-                confirmButtonText: "Complete"
+                confirmButtonText: "Complete",
+                confirmButtonRole: .destructive
             )
             .fullScreenCover(isPresented: $isPreviewOpen) {
                 if let image = firstParkingRecord?.images[selectedImageIndex].getImage() {

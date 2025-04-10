@@ -11,17 +11,34 @@ struct AlertComponent: ViewModifier {
     @Binding var isPresented: Bool
     let title: String
     let message: String
-    let confirmAction: (() -> Void)?
     
+    let cancelAction: (() -> Void)?
     let cancelButtonText: String
+    let cancelButtonRole: ButtonRole?
+    
+    let confirmAction: (() -> Void)?
     let confirmButtonText: String
+    let confirmButtonRole: ButtonRole?
     
     func body(content: Content) -> some View {
         content
             .alert(title, isPresented: $isPresented) {
-                Button(cancelButtonText, role: .cancel) { }
-                if let action = confirmAction {
-                    Button(confirmButtonText, role: .destructive, action: action)
+                
+                Button(role: cancelButtonRole) {
+                    if let _ = cancelAction {
+                        cancelAction?()
+                    }
+                } label: {
+                    Text(cancelButtonText)
+                }
+                
+                
+                Button(role: confirmButtonRole) {
+                    if let _ = confirmAction {
+                        confirmAction?()
+                    }
+                } label: {
+                    Text(confirmButtonText)
                 }
             } message: {
                 Text(message)
@@ -34,18 +51,28 @@ extension View {
         isPresented: Binding<Bool>,
         title: String,
         message: String,
-        confirmAction: (() -> Void)? = nil,
+        
+        cancelAction: (() -> Void)? = nil,
         cancelButtonText: String = "Cancel",
-        confirmButtonText: String = "Confirm"
+        cancelButtonRole: ButtonRole = .cancel,
+        
+        confirmAction: (() -> Void)? = nil,
+        confirmButtonText: String = "Confirm",
+        confirmButtonRole: ButtonRole? = nil
     ) -> some View {
         self.modifier(
             AlertComponent(
                 isPresented: isPresented,
                 title: title,
                 message: message,
-                confirmAction: confirmAction,
+                
+                cancelAction: cancelAction,
                 cancelButtonText: cancelButtonText,
-                confirmButtonText: confirmButtonText
+                cancelButtonRole: cancelButtonRole,
+                
+                confirmAction: confirmAction,
+                confirmButtonText: confirmButtonText,
+                confirmButtonRole: confirmButtonRole
             )
         )
     }

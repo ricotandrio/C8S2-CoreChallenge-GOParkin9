@@ -206,7 +206,8 @@ struct HistoryView: View {
             title: "Delete All Selected Records?",
             message: "This action cannot be undone.",
             confirmAction: deleteSelection,
-            confirmButtonText: "Delete"
+            confirmButtonText: "Delete",
+            confirmButtonRole: .destructive
         )
         .alertComponent(
             isPresented: $showAlertDeleteSingle,
@@ -217,7 +218,8 @@ struct HistoryView: View {
                     deleteItem(entry)
                 }
             },
-            confirmButtonText: "Delete"
+            confirmButtonText: "Delete",
+            confirmButtonRole: .destructive
         )
     }
     
