@@ -75,7 +75,7 @@ struct DetailRecord: View {
             .alertComponent(
                 isPresented: $isComplete,
                 title: "Complete this record?",
-                message: "This action cannot be undone.",
+                message: "This action will move the record to history and cannot be undone.",
                 confirmAction: complete,
                 confirmButtonText: "Complete",
                 confirmButtonRole: .destructive
