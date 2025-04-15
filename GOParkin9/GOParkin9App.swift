@@ -16,7 +16,7 @@ struct GOParkin9App: App {
     @State private var isSplashActive = true
     @AppStorage("openWelcomeView") var openWelcomeView: Bool = true
 
-    
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([ParkingRecord.self]) // Register your model
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
