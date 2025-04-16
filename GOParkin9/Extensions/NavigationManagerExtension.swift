@@ -5,6 +5,8 @@
 //  Created by Rico Tandrio on 13/04/25.
 //
 
+import CoreLocation
+
 extension NavigationManager {
     func angle(to destination: CLLocationCoordinate2D) -> Double {
         guard let from = self.location?.coordinate else { return 0 }
@@ -51,8 +53,4 @@ extension NavigationManager {
         let earthRadius = 6371.0 // Radius bumi dalam kilometer
         return earthRadius * c * 1000 // Jarak dalam meter
     }
-    
-//    func getLongitude() -> Double {
-//        return Double(self.location.coordinate.latitude ?? 0.0)
-//    }
 }

@@ -14,9 +14,12 @@ struct GOParkin9App: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     @State private var isSplashActive = true
-    @AppStorage("openWelcomeView") var openWelcomeView: Bool = true
+    
+    @StateObject private var userSettingsVM = UserSettingsViewModel()
 
-
+    @State private var alwaysTrue = true
+    
+    // Shared ModelContainer for
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([ParkingRecord.self]) // Register your model
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -36,20 +39,13 @@ struct GOParkin9App: App {
                         }
                     }
             } else {
-//                if hasSeenWelcome {
-//                    ContentView()
-//                } else{
-//                    ContentView()
-//                        .modelContainer(sharedModelContainer)
-//                }
                 ContentView()
                     .modelContainer(sharedModelContainer)
-                    .fullScreenCover(isPresented: $openWelcomeView) {
-
+                    .fullScreenCover(isPresented: $userSettingsVM.isFirstLaunch) {
                         WelcomeScreenView()
                     }
             }
-            //        .modelContainer(for: [ParkingRecord.self])
         }
+        .environmentObject(userSettingsVM)
     }
 }

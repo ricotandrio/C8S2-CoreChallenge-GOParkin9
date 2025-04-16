@@ -10,7 +10,7 @@ import CoreLocation
 
 class NavigationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     
-    private let locationManager: CLLocationManager = CLLocationManager()
+    let locationManager: CLLocationManager = CLLocationManager()
     
     @Published var location: CLLocation?
     @Published var heading: CLHeading?

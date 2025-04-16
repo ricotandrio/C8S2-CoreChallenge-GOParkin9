@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ConfigAutomaticDeleteView: View {
-    @AppStorage("deleteHistoryAfterInDay") private var deleteHistoryAfterInDay: Int = 5
+    @EnvironmentObject private var userSettingsVM: UserSettingsViewModel
 
     let options: [Int] = [1, 3, 5, 7, 14, 30, 60, 90]
     
@@ -19,14 +19,14 @@ struct ConfigAutomaticDeleteView: View {
                     HStack {
                         Text("\(option) Days\(option == 5 ?  " (Default)" : "")")
                         Spacer()
-                        if deleteHistoryAfterInDay == option {
+                        if userSettingsVM.daysBeforeAutomaticDelete == option {
                             Image(systemName: "checkmark")
                                 .foregroundColor(.blue)
                         }
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        deleteHistoryAfterInDay = option
+                        userSettingsVM.setDaysBeforeAutomaticDelete(to: option)
                     }
                 }
             }
