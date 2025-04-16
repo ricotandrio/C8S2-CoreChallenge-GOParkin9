@@ -76,6 +76,7 @@ struct ModalView: View {
                 } label: {
                     Text("Done")
                 }
+                .disabled(selectedFloor==nil)
                 .alert("Floor haven't selected", isPresented: $showingAlertSave) {
                     Button("OK") {
                     }
@@ -202,7 +203,7 @@ struct GridView: View {
                     CameraView(image: $newImage)
                         .ignoresSafeArea()
                 }
-                .onChange(of: newImage) { newValue in
+                .onChange(of: newImage) { oldValue, newValue in
                     if let newImage = newValue {
                         images.append(newImage)
                         self.newImage = nil
