@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WelcomeScreenView: View {
-    @AppStorage("openWelcomeView") var openWelcomeView: Bool = true
+    @EnvironmentObject private var userSettingsVM: UserSettingsViewModel
     
     var body: some View {
         ZStack {
@@ -49,7 +49,7 @@ struct WelcomeScreenView: View {
 
                 // Get Started Button
                 Button(action: {
-                    openWelcomeView = false
+                    userSettingsVM.alreadyLaunched()
                 }) {
                     Text("Get Started")
                         .font(.headline)
