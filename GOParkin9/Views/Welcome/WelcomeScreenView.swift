@@ -49,7 +49,7 @@ struct WelcomeScreenView: View {
 
                 // Get Started Button
                 Button(action: {
-                    userSettingsVM.alreadyLaunched()
+                    userSettingsVM.markAppAsLaunched()
                 }) {
                     Text("Get Started")
                         .font(.headline)
@@ -66,35 +66,6 @@ struct WelcomeScreenView: View {
     }
 }
 
-// MARK: - Feature Circle View
-struct FeatureCircleView: View {
-    let icon: String
-    let caption: String
-
-    var body: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(width: 80, height: 80)
-
-                Image(systemName: icon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 35, height: 35)
-                    .foregroundColor(Color.blue)
-            }
-
-            Text(caption)
-                .font(.footnote)
-                .multilineTextAlignment(.center)
-                .frame(width: 80)
-        }
-    }
-}
-
 #Preview {
     WelcomeScreenView()
 }
-
-//gatau ini bakal works engga pas pertama kali buka

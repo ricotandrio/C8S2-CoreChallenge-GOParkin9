@@ -32,10 +32,8 @@ struct ModalView: View {
         let record = ParkingRecord(
             latitude: latitude,
             longitude: longitude,
-            isHistory: false,
-            floor: floor,
-            createdAt: dateTime,
-            images: convertedImages
+            images: convertedImages,
+            floor: floor
         )
         
         context.insert(record)

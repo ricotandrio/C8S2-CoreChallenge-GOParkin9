@@ -25,11 +25,8 @@ class ParkingRecord: Identifiable {
     init (
         latitude: Double,
         longitude: Double,
-        isHistory: Bool,
-        floor: String,
-        createdAt: Date,
-//        completedAt: Date,
-        images: [ParkingImage]
+        images: [ParkingImage],
+        floor: String
     ) {
         self.latitude = latitude
         self.longitude = longitude

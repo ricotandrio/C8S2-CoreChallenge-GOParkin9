@@ -9,13 +9,6 @@ import SwiftUI
 import CoreLocation
 import SwiftData
 
-struct Location: Identifiable {
-    let id: Int
-    let name: String
-    let label: String
-    let coordinate: CLLocationCoordinate2D
-}
-
 struct CompassView: View {
     @StateObject var navigationManager = NavigationManager()
     @State var isSpeechEnabled = false

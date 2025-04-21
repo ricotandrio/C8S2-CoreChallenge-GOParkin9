@@ -6,26 +6,40 @@
 //
 
 import Foundation
-import SwiftUI
 
 class UserSettingsViewModel: ObservableObject {
-    @AppStorage(Keys.daysBeforeAutomaticDelete.id) var daysBeforeAutomaticDelete: Int = 5
-    @AppStorage(Keys.isFirstLaunch.id) var isFirstLaunch: Bool = true
-
-    enum Keys {
-        case daysBeforeAutomaticDelete
-        case isFirstLaunch
-        
-        var id: String {
-            "\(self)"
+    private var manager: UserSettingsProtocol
+    
+    @Published var daysBeforeAutomaticDelete: Int = 5 {
+        didSet {
+            manager.setDaysBeforeAutomaticDelete(to: daysBeforeAutomaticDelete)
         }
     }
     
-    func setDaysBeforeAutomaticDelete(to days: Int) {
-        daysBeforeAutomaticDelete = days
+    @Published var isFirstLaunch: Bool = true {
+        didSet {
+            manager.markAppAsLaunched()
+        }
     }
     
-    func alreadyLaunched() {
-        isFirstLaunch = false
+    init(manager: UserSettingsProtocol = UserSettingsManager()) {
+        self.manager = manager
+        
+        loadManager()
+    }
+    
+    func loadManager() {
+        self.daysBeforeAutomaticDelete = manager.getDaysBeforeAutomaticDelete()
+        self.isFirstLaunch = manager.getIsFirstLaunch()
+    }
+    
+    func markAppAsLaunched() {
+        self.isFirstLaunch = false
+    }
+    
+    func setDaysBeforeAutomaticDelete(to days: Int) {
+        self.daysBeforeAutomaticDelete = days
     }
 }
+
+

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.modelContext) var context
 
     var body: some View {
         VStack {
@@ -17,7 +18,11 @@ struct ContentView: View {
                        Label("Menu", systemImage: "house")
                    }
 
-                HistoryView()
+                HistoryView(
+                    historyVM: HistoryViewModel(
+                        parkingRecordRepository: ParkingRecordRepository(context: context)
+                    )
+                )
                    .tabItem {
                        Label("History", systemImage: "clock")
                    }

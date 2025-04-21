@@ -11,36 +11,19 @@ import SwiftData
 @main
 struct GOParkin9App: App {
 
-    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-
-    @State private var isSplashActive = true
-    
-    @StateObject private var userSettingsVM = UserSettingsViewModel()
-
-    @State private var alwaysTrue = true
-    
-    // Shared ModelContainer for
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([ParkingRecord.self]) // Register your model
-        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-        return try! ModelContainer(for: schema, configurations: [config])
-    }()
+    @StateObject private var userStartVM: UserStartViewModel = UserStartViewModel()
+    @StateObject private var userSettingsVM: UserSettingsViewModel = UserSettingsViewModel()
     
     var body: some Scene {
         WindowGroup {
-            if isSplashActive {
+            if userStartVM.isSplashActive {
                 SplashScreenView()
                     .onAppear {
-                        // Hide splash screen after 3 seconds (adjust as needed)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                            withAnimation {
-                                isSplashActive = false
-                            }
-                        }
+                        userStartVM.startSplashTimer()
                     }
             } else {
                 ContentView()
-                    .modelContainer(sharedModelContainer)
+                    .modelContainer(userStartVM.sharedModelContainer)
                     .fullScreenCover(isPresented: $userSettingsVM.isFirstLaunch) {
                         WelcomeScreenView()
                     }

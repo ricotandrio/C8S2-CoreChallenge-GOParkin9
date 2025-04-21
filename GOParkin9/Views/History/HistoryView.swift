@@ -11,115 +11,86 @@ import SwiftData
 
 
 struct HistoryView: View {
-
+    @ObservedObject private var historyVM: HistoryViewModel
+    
     @EnvironmentObject private var userSettingsVM: UserSettingsViewModel
 
-    @Environment(\.modelContext) var context
-
-    // This variable belongs to sort the history feature
-    @State private var isReverse: Bool = false
-    
-    // This variable belongs to the select to delete feature
-    @State private var isSelecting: Bool = false
-    @State private var selectedParkingRecords: Set<UUID> = []
-    
-    // This variable belongs to navigate to ConfigAutomaticDelete
-    @State private var navigateToConfigAutomaticDelete: Bool = false
-    
-    // This variable belongs to alert
-    @State private var showAlertHistoryEmpty: Bool = false
-    @State private var showAlertDeleteSelection: Bool = false
-    @State private var showAlertDeleteSingle: Bool = false
-    @State private var selectedHistoryToBeDeleted: ParkingRecord?
-    
-    // This variable used to fetch all history data
-    @Query(
-        filter: #Predicate<ParkingRecord> { p in p.isHistory == true },
-        sort: [SortDescriptor(\.createdAt)]
-    ) var allParkingRecords: [ParkingRecord]
-    
-    var sortedParkingRecords: [ParkingRecord] {
-        allParkingRecords.sorted {
-            isReverse ? $0.createdAt < $1.createdAt : $0.createdAt > $1.createdAt
-        }
-    }
-    
-    var unpinnedParkingRecords: [ParkingRecord] {
-        sortedParkingRecords.filter { !$0.isPinned }
-    }
-
-    var pinnedParkingRecords: [ParkingRecord] {
-        sortedParkingRecords.filter { $0.isPinned }
+    init(historyVM: HistoryViewModel) {
+        self.historyVM = historyVM
     }
     
     var body: some View {
         NavigationStack {
             List {
 
-                if allParkingRecords.isEmpty {
+                if historyVM.isHistoriesEmpty {
                     Text("No history yet")
                         .foregroundColor(.secondary)
                 }
                 
-                if !pinnedParkingRecords.isEmpty {
-                    HStack {
-                        Image(systemName: "pin")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
-                            .padding(.trailing, 10)
+                Group {
+                    if !historyVM.getAllPinnedHistories().isEmpty {
+                        HStack {
+                            Image(systemName: "pin")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 20)
+                                .padding(.trailing, 10)
+                            
+                            
+                            Text("Pinned")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .opacity(0.6)
+                        }
                         
-                        
-                        Text("Pinned")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .opacity(0.6)
-                    }
-                    
-                    ForEach(pinnedParkingRecords) { entry in
-                        HistoryCard(
-                            entry: entry,
-                            pinItem: { pinItem(entry) },
-                            deleteItem: {
-                                selectedHistoryToBeDeleted = entry
-                                showAlertDeleteSingle.toggle()
-                            },
-                            isSelecting: isSelecting,
-                            isSelected: selectedParkingRecords.contains(entry.id),
-                            toggleSelection: { toggleSelection(entry) }
-                        )
+                        ForEach(historyVM.getAllPinnedHistories()) { entry in
+                            HistoryCard(
+                                entry: entry,
+                                pinItem: { historyVM.pinItem(entry) },
+                                deleteItem: {
+                                    historyVM.selectedHistoryToBeDeleted = entry
+                                    historyVM.showAlertDeleteSingle.toggle()
+                                },
+                                isSelecting: historyVM.isSelecting,
+                                isSelected: historyVM.selectedParkingRecords.contains(entry.id),
+                                toggleSelection: { historyVM.toggleSelection(entry) }
+                            )
+                        }
                     }
                 }
                 
-                if !unpinnedParkingRecords.isEmpty {
-                    HStack {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
-                            .padding(.trailing, 10)
+                Group {
+                    if !historyVM.getAllUnpinnedHistories().isEmpty {
+                        HStack {
+                            Image(systemName: "clock.arrow.circlepath")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 20)
+                                .padding(.trailing, 10)
+                            
+                            
+                            Text("All History")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .opacity(0.6)
+                        }
                         
+                        ForEach(historyVM.getAllUnpinnedHistories(), id: \.id) { entry in
+                            HistoryCard(
+                                entry: entry,
+                                pinItem: { historyVM.pinItem(entry) },
+                                deleteItem: {
+                                    historyVM.selectedHistoryToBeDeleted = entry
+                                    historyVM.showAlertDeleteSingle.toggle()
+                                },
+                                isSelecting: historyVM.isSelecting,
+                                isSelected: historyVM.selectedParkingRecords.contains(entry.id),
+                                toggleSelection: { historyVM.toggleSelection(entry) }
+                            )
+                        }
                         
-                        Text("All History")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .opacity(0.6)
                     }
-                    
-                    ForEach(unpinnedParkingRecords, id: \.id) { entry in
-                        HistoryCard(
-                            entry: entry,
-                            pinItem: { pinItem(entry) },
-                            deleteItem: {
-                                selectedHistoryToBeDeleted = entry
-                                showAlertDeleteSingle.toggle()
-                            },
-                            isSelecting: isSelecting,
-                            isSelected: selectedParkingRecords.contains(entry.id),
-                            toggleSelection: { toggleSelection(entry) }
-                        )
-                    }
-
                 }
             }
             .navigationTitle("History")
@@ -129,17 +100,16 @@ struct HistoryView: View {
 
                         // Button for sort the history by date
                         Button {
-                            isReverse.toggle()
+                            historyVM.isDescending.toggle()
                         } label: {
                             Text("Sort by Date")
-                            Text("\(isReverse ? "Oldest First" : "Most Recent First")")
+                            Text("\(historyVM.isDescending ? "Most Recent First" : "Oldest First")")
                                 .font(.subheadline)
                             Image(systemName: "arrow.up.arrow.down")
-
                         }
                         
                         Button {
-                            navigateToConfigAutomaticDelete.toggle()
+                            historyVM.navigateToConfigAutomaticDelete.toggle()
                         } label: {
                             Text("Delete Automatically")
                             Text("History will be deleted after \(userSettingsVM.daysBeforeAutomaticDelete) days")
@@ -149,25 +119,25 @@ struct HistoryView: View {
                         
                         // Button for cancel the selection
                         Button {
-                            if !allParkingRecords.isEmpty {
-                                cancelSelection()
+                            if !historyVM.isHistoriesEmpty {
+                                historyVM.cancelSelection()
                             } else {
-                                showAlertHistoryEmpty.toggle()
+                                historyVM.showAlertHistoryEmpty.toggle()
                             }
                         } label: {
-                            Text(isSelecting ? "Cancel" : "Select")
-                            Text(isSelecting ? "Cancel Selection" : "Select Multiple")
+                            Text(historyVM.isSelecting ? "Cancel" : "Select")
+                            Text(historyVM.isSelecting ? "Cancel Selection" : "Select Multiple")
                                 .font(.subheadline)
-                            Image(systemName: isSelecting ? "checkmark.circle" : "checkmark.circle.fill")
+                            Image(systemName: historyVM.isSelecting ? "checkmark.circle" : "checkmark.circle.fill")
                         }
                         
                         // Button for delete the selected history only if the selection is active
-                        if isSelecting && !selectedParkingRecords.isEmpty {
+                        if historyVM.isSelecting && !historyVM.selectedParkingRecords.isEmpty {
                             Button {
-                                showAlertDeleteSelection.toggle()
+                                historyVM.showAlertDeleteSelection.toggle()
                             } label: {
                                 Text("Delete Selected")
-                                Text("\(selectedParkingRecords.count) selected")
+                                Text("\(historyVM.selectedParkingRecords.count) selected")
                                     .font(.subheadline)
                                 Image(systemName: "trash")
                             }
@@ -177,95 +147,42 @@ struct HistoryView: View {
                     }
                 }
             }
-            .navigationDestination(isPresented: $navigateToConfigAutomaticDelete) {
+            .navigationDestination(isPresented: $historyVM.navigateToConfigAutomaticDelete) {
                 ConfigAutomaticDeleteView()
             }
         }
         .onAppear {
             // This responsible for delete the history after certain days
-            let calendar = Calendar.current
-            let expirationDate = calendar.date(byAdding: .day, value: -userSettingsVM.daysBeforeAutomaticDelete, to: Date()) ?? Date()
-
-
-            for entry in allParkingRecords {
-                if entry.createdAt < expirationDate && !entry.isPinned {
-                    context.delete(entry)
-                }
-            }
-
-            try? context.save()
+            historyVM.automaticDeleteHistoryAfter(
+                userSettingsVM.daysBeforeAutomaticDelete
+            )
         }
         .alertComponent(
-            isPresented: $showAlertHistoryEmpty,
+            isPresented: $historyVM.showAlertHistoryEmpty,
             title: "There's no history yet",
             message: "Please complete a parking first.",
             confirmButtonText: "OK"
         )
         .alertComponent(
-            isPresented: $showAlertDeleteSelection,
+            isPresented: $historyVM.showAlertDeleteSelection,
             title: "Delete All Selected Records?",
             message: "This action cannot be undone.",
-            confirmAction: deleteSelection,
+            confirmAction: historyVM.deleteSelection,
             confirmButtonText: "Delete",
             confirmButtonRole: .destructive
         )
         .alertComponent(
-            isPresented: $showAlertDeleteSingle,
+            isPresented: $historyVM.showAlertDeleteSingle,
             title: "Delete This Record?",
             message: "This action cannot be undone.",
             confirmAction: {
-                if let entry = selectedHistoryToBeDeleted {
-                    deleteItem(entry)
+                if let entry = historyVM.selectedHistoryToBeDeleted {
+                    historyVM.deleteItem(entry)
                 }
             },
             confirmButtonText: "Delete",
             confirmButtonRole: .destructive
         )
-    }
-    
-    // This function belongs to button for cancel the selection
-    private func cancelSelection() {
-        selectedParkingRecords.removeAll()
-        isSelecting.toggle()
-    }
-    
-    // This function belongs to button for delete the selected history only if the selection is active
-    private func deleteSelection() {
-        selectedParkingRecords.forEach { id in
-            if let entry = allParkingRecords.first(where: { $0.id == id }) {
-                deleteItem(entry)
-            }
-        }
-        selectedParkingRecords.removeAll()
-        isSelecting.toggle()
-    }
-    
-    // This function belongs to button for check the selected history
-    private func toggleSelection(_ entry: ParkingRecord) {
-        withAnimation {
-            if selectedParkingRecords.contains(entry.id) {
-                selectedParkingRecords.remove(entry.id)
-            } else {
-                selectedParkingRecords.insert(entry.id)
-            }
-        }
-    }
-
-    // This function belongs to pin button that can be accessed by swipe history
-    private func pinItem(_ entry: ParkingRecord) {
-        withAnimation {
-            entry.isPinned.toggle()
-            try? context.save()
-        }
-    }
-    
-    // This function belongs to delete button that can be accessed by swipe history
-    private func deleteItem(_ entry: ParkingRecord) {
-        withAnimation {
-            context.delete(entry)
-            try? context.save()
-        }
-
     }
 }
 

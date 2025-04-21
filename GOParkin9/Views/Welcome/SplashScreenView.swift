@@ -7,15 +7,6 @@
 
 import SwiftUI
 
-//extension Color {
-//    static let backgroundColor = Color(red: 246/255, green: 247/255, blue: 237/255) //Praxeti White
-//    static let mainColor = Color(red: 0/255, green: 31/255, blue: 63/255) //Midnight Mirage
-//    static let highligthColor = Color(red: 219/255, green: 230/255, blue: 76/255) //First Color of Spring
-//    static let secondaryColor1 = Color(red: 30/255, green: 72/255, blue: 143/255) //Nuit Blache
-//    static let secondaryColor2 = Color(red: 0/255, green: 128/255, blue: 76/255) //Picture Book Green
-//    static let secondaryColor3 = Color(red: 116/255, green: 195/255, blue: 101/255) //Mantis
-//}
-
 struct SplashScreenView: View {
     @State private var animateToCenter = false
     @State private var scaleDown = false
