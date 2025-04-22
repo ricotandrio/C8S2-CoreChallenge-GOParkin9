@@ -7,21 +7,14 @@
 
 import SwiftUI
 
-struct NavigationButton: Identifiable {
-    let id: Int
-    let name: String
-    let icon: String
-}
-
 struct NavigationButtonList: View {
-    let navigations: [NavigationButton]
-    @Binding var selectedNavigation: Int
+    @ObservedObject var navigationListVM: NavigationListViewModel
     
     var body: some View {
         HStack(alignment: .top, spacing: 30) {
-            ForEach(navigations) { navigation in
+            ForEach(navigationListVM.navigations) { navigation in
                 Button {
-                    selectedNavigation = navigation.id
+                    navigationListVM.setSelectedNavigation(to: navigation.id)
                 } label: {
                     VStack {
                         Image(systemName: navigation.icon)
@@ -54,18 +47,7 @@ struct NavigationButtonList: View {
 }
 
 struct NavigationList: View {
-
-    @State var isCompassOpen: Bool = false
-    @State var showCompassView: Bool = false
-    @State var selectedNavigation:Int = 0
-
-    let navigations = [
-        NavigationButton(id:1, name: "Entry Gate Basement 1", icon: "pedestrian.gate.open"),
-        NavigationButton(id:2, name: "Exit Gate Basement 1", icon: "pedestrian.gate.closed"),
-        NavigationButton(id:3, name: "Charging Station", icon: "bolt.car"),
-        NavigationButton(id:4, name: "Entry Gate Basement 2", icon: "pedestrian.gate.open"),
-        NavigationButton(id:5, name: "Exit Gate Basement 2", icon: "pedestrian.gate.closed"),
-    ]
+    @StateObject var navigationListVM = NavigationListViewModel()
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -85,19 +67,17 @@ struct NavigationList: View {
              
                 ScrollView(.horizontal, showsIndicators: false) {
                     NavigationButtonList(
-                        navigations: navigations,
-                        selectedNavigation: $selectedNavigation
+                        navigationListVM: navigationListVM
                     )
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
-                .onChange(of: selectedNavigation) {
-                    isCompassOpen.toggle()
-                    showCompassView = true
+                .onChange(of: navigationListVM.selectedNavigation) {
+                    navigationListVM.isCompassOpen.toggle()
                 }
-                .fullScreenCover(isPresented: $isCompassOpen) {
+                .fullScreenCover(isPresented: $navigationListVM.isCompassOpen) {
                         CompassView(
-                            isCompassOpen: $isCompassOpen,
-                            selectedLocation: selectedNavigation,
+                            isCompassOpen: $navigationListVM.isCompassOpen,
+                            selectedLocation: navigationListVM.selectedNavigation,
                             longitude: 0,
                             latitude: 0
                         )

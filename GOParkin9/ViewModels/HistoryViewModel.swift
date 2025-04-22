@@ -58,6 +58,8 @@ class HistoryViewModel: ObservableObject {
         let expirationDate = Calendar.current.date(byAdding: .day, value: -daysBeforeAutomaticDelete, to: Date()) ?? Date()
         
         parkingRecordRepository.deleteExpiredHistories(expirationDate: expirationDate)
+        
+        synchronizeHistories()
     }
 
     // This function belongs to button for cancel the selection
@@ -103,6 +105,8 @@ class HistoryViewModel: ObservableObject {
                 floor: entry.floor
             )
         }
+        
+        synchronizeHistories()
     }
     
     // This function belongs to delete button that can be accessed by swipe history
@@ -110,5 +114,7 @@ class HistoryViewModel: ObservableObject {
         withAnimation {
             parkingRecordRepository.delete(entry)
         }
+        
+        synchronizeHistories()
     }
 }
