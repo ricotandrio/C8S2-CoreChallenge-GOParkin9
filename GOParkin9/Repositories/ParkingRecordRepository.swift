@@ -108,44 +108,7 @@ class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
         }
     }
     
-    func getAllPinnedHistories() -> [ParkingRecord] {
-        let fetchDescriptor = FetchDescriptor<ParkingRecord>(
-            predicate: #Predicate<ParkingRecord> { p in
-                p.isPinned == true
-            }
-        )
-        
-        do {
-            let parkingRecords = try context.fetch(fetchDescriptor)
-            
-            return parkingRecords
-        } catch {
-            print("Error fetching parking records: \(error)")
-            return []
-        }
-    }
-    
-    func getAllUnpinnedHistories() -> [ParkingRecord] {
-        let fetchDescriptor = FetchDescriptor<ParkingRecord>(
-            predicate: #Predicate<ParkingRecord> { p in
-                p.isPinned == false && p.isHistory == true
-            }
-        )
-        
-        do {
-            let parkingRecords = try context.fetch(fetchDescriptor)
-            
-            return parkingRecords
-        } catch {
-            print("Error fetching parking records: \(error)")
-            return []
-        }
-    }
-    
     func deleteExpiredHistories(expirationDate: Date) {
-        
-        let calendar = Calendar.current
-
         for entry in self.getAllHistories() {
             if entry.createdAt < expirationDate && !entry.isPinned {
                 context.delete(entry)

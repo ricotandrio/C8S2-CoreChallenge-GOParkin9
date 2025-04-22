@@ -12,7 +12,7 @@ import SwiftData
 
 class HistoryViewModel: ObservableObject {
     private var parkingRecordRepository: ParkingRecordRepositoryProtocol
-    
+
     // This variable belongs to sort the history feature
     @Published var isDescending: Bool = true
     
@@ -30,21 +30,28 @@ class HistoryViewModel: ObservableObject {
     @Published var selectedHistoryToBeDeleted: ParkingRecord?
     
     // This variable used to fetch all history data
-    @Published var isHistoriesEmpty: Bool
+    @Published var histories: [ParkingRecord] = []
     
     init(parkingRecordRepository: ParkingRecordRepositoryProtocol) {
         self.parkingRecordRepository = parkingRecordRepository
         
-        self.isHistoriesEmpty = parkingRecordRepository.getAllHistories().isEmpty
-        
+        self.histories = parkingRecordRepository.getAllHistories()
+    }
+    
+    func synchronizeHistories() {
+        self.histories = parkingRecordRepository.getAllHistories()
     }
     
     func getAllPinnedHistories() -> [ParkingRecord] {
-        return parkingRecordRepository.getAllPinnedHistories().sorted(by: { isDescending ? $0.createdAt > $1.createdAt : $0.createdAt < $1.createdAt })
+        return self.histories
+            .filter({ $0.isPinned })
+            .sorted(by: { isDescending ? $0.createdAt > $1.createdAt : $0.createdAt < $1.createdAt })
     }
     
     func getAllUnpinnedHistories() -> [ParkingRecord] {
-        return parkingRecordRepository.getAllUnpinnedHistories().sorted(by: { isDescending ? $0.createdAt > $1.createdAt : $0.createdAt < $1.createdAt })
+        return self.histories
+            .filter({ !$0.isPinned })
+            .sorted(by: { isDescending ? $0.createdAt > $1.createdAt : $0.createdAt < $1.createdAt })
     }
     
     func automaticDeleteHistoryAfter(_ daysBeforeAutomaticDelete: Int) {
@@ -52,8 +59,7 @@ class HistoryViewModel: ObservableObject {
         
         parkingRecordRepository.deleteExpiredHistories(expirationDate: expirationDate)
     }
-    
-    
+
     // This function belongs to button for cancel the selection
     func cancelSelection() {
         self.selectedParkingRecords.removeAll()

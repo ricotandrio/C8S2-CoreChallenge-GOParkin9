@@ -27,7 +27,5 @@ protocol ParkingRecordRepositoryProtocol {
     func delete(_ parkingRecord: ParkingRecord)
     func getActiveParkingRecord() -> ParkingRecord?
     func getAllHistories() -> [ParkingRecord]
-    func getAllPinnedHistories() -> [ParkingRecord]
-    func getAllUnpinnedHistories() -> [ParkingRecord]
     func deleteExpiredHistories(expirationDate: Date) 
 }

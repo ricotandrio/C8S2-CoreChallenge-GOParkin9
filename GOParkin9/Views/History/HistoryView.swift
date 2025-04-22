@@ -23,7 +23,7 @@ struct HistoryView: View {
         NavigationStack {
             List {
 
-                if historyVM.isHistoriesEmpty {
+                if historyVM.histories.isEmpty {
                     Text("No history yet")
                         .foregroundColor(.secondary)
                 }
@@ -119,7 +119,7 @@ struct HistoryView: View {
                         
                         // Button for cancel the selection
                         Button {
-                            if !historyVM.isHistoriesEmpty {
+                            if !historyVM.histories.isEmpty {
                                 historyVM.cancelSelection()
                             } else {
                                 historyVM.showAlertHistoryEmpty.toggle()
@@ -156,6 +156,9 @@ struct HistoryView: View {
             historyVM.automaticDeleteHistoryAfter(
                 userSettingsVM.daysBeforeAutomaticDelete
             )
+            
+            // This responsible for synchronize the history
+            historyVM.synchronizeHistories()
         }
         .alertComponent(
             isPresented: $historyVM.showAlertHistoryEmpty,
