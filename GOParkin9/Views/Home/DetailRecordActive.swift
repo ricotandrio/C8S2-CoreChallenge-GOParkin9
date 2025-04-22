@@ -9,21 +9,14 @@ import SwiftUI
 import SwiftData
 
 struct DetailRecordActive: View {
-    @Binding var isPreviewOpen: Bool
-    @Binding var isCompassOpen: Bool
-    @Binding var selectedImageIndex: Int
-    @State var dateTime: Date
-    @State var parkingRecord: ParkingRecord
-    @Environment(\.modelContext) var context
-    
-    @Binding var isComplete: Bool
+    @ObservedObject var detailRecordVM: DetailRecordViewModel
     
     var body: some View {
         
         ParkingRecordImageView(
-            parkingRecordImage: parkingRecord.images,
-            isPreviewOpen: $isPreviewOpen,
-            selectedImageIndex: $selectedImageIndex
+            parkingRecordImage: detailRecordVM.activeParkingRecord!.images,
+            isPreviewOpen: $detailRecordVM.isPreviewOpen,
+            selectedImageIndex: $detailRecordVM.selectedImageIndex
         )
         
         Spacer()
@@ -46,7 +39,7 @@ struct DetailRecordActive: View {
                         
                     }
                     
-                    Text(dateTime, format: .dateTime.day().month().year())
+                    Text(detailRecordVM.activeParkingRecord!.createdAt, format: .dateTime.day().month().year())
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
@@ -65,7 +58,7 @@ struct DetailRecordActive: View {
                         
                     }
                     
-                    Text(dateTime, format: .dateTime.hour().minute())
+                    Text(detailRecordVM.activeParkingRecord!.createdAt, format: .dateTime.hour().minute())
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
@@ -91,7 +84,7 @@ struct DetailRecordActive: View {
                 
             }
             
-            Text("GOP 9, \(parkingRecord.floor)")
+            Text("GOP 9, \(detailRecordVM.activeParkingRecord!.floor)")
                 .font(.subheadline)
                 .fontWeight(.medium)
         }
@@ -101,8 +94,7 @@ struct DetailRecordActive: View {
         
         HStack(spacing: 16) {
             Button {
-                print("Navigate")
-                isCompassOpen.toggle()
+                detailRecordVM.isCompassOpen.toggle()
             } label: {
                 HStack {
                     Image(systemName: "figure.walk")
@@ -123,7 +115,7 @@ struct DetailRecordActive: View {
             .frame(maxWidth: .infinity)
             
             Button {
-                isComplete.toggle()
+                detailRecordVM.isComplete.toggle()
             } label: {
                 HStack {
                     Image(systemName: "car")

@@ -48,7 +48,8 @@ class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
         isPinned: Bool,
         isHistory: Bool,
         images: [ParkingImage],
-        floor: String
+        floor: String,
+        completedAt: Date
     ) {
         do {
             parkingRecord.latitude = latitude
@@ -57,6 +58,7 @@ class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
             parkingRecord.isHistory = isHistory
             parkingRecord.images = images
             parkingRecord.floor = floor
+            parkingRecord.completedAt = completedAt
             
             try context.save()
         } catch {

@@ -158,7 +158,7 @@ struct HistoryView: View {
             )
             
             // This responsible for synchronize the history
-            historyVM.synchronizeHistories()
+            historyVM.synchronize()
         }
         .alertComponent(
             isPresented: $historyVM.showAlertHistoryEmpty,

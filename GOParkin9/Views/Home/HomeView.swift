@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject private var userSettingsVM: UserSettingsViewModel
+    @Environment(\.modelContext) var context
 
     var body: some View {
         NavigationStack {
@@ -16,7 +17,11 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     NavigationList()
 
-                    DetailRecord()
+                    DetailRecord(
+                        detailRecordVM: DetailRecordViewModel(
+                            parkingRecordRepository: ParkingRecordRepository(context: context)
+                        )
+                    )
                 }
                 .navigationTitle("GOParkin9")
                 .padding()

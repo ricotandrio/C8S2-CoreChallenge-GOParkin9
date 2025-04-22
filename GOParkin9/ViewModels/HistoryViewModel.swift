@@ -35,10 +35,10 @@ class HistoryViewModel: ObservableObject {
     init(parkingRecordRepository: ParkingRecordRepositoryProtocol) {
         self.parkingRecordRepository = parkingRecordRepository
         
-        self.histories = parkingRecordRepository.getAllHistories()
+        self.histories = parkingRecordRepository.getAllHistories()   
     }
     
-    func synchronizeHistories() {
+    func synchronize() {
         self.histories = parkingRecordRepository.getAllHistories()
     }
     
@@ -59,7 +59,7 @@ class HistoryViewModel: ObservableObject {
         
         parkingRecordRepository.deleteExpiredHistories(expirationDate: expirationDate)
         
-        synchronizeHistories()
+        self.synchronize()
     }
 
     // This function belongs to button for cancel the selection
@@ -102,11 +102,12 @@ class HistoryViewModel: ObservableObject {
                 isPinned: entry.isPinned ? false : true,
                 isHistory: entry.isHistory,
                 images: entry.images,
-                floor: entry.floor
+                floor: entry.floor,
+                completedAt: entry.completedAt
             )
         }
         
-        synchronizeHistories()
+        self.synchronize()
     }
     
     // This function belongs to delete button that can be accessed by swipe history
@@ -115,6 +116,6 @@ class HistoryViewModel: ObservableObject {
             parkingRecordRepository.delete(entry)
         }
         
-        synchronizeHistories()
+        self.synchronize()
     }
 }

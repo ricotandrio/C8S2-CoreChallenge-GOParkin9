@@ -9,42 +9,25 @@ import SwiftUI
 import SwiftData
 
 struct DetailRecord: View {
-    @State private var selectedImageIndex = 0
-    @State private var isPreviewOpen = false
-    @State var isCompassOpen: Bool = false
-    
-    @State var isComplete: Bool = false
 
-    @Query(filter: #Predicate<ParkingRecord>{p in p.isHistory == false}) var parkingRecords: [ParkingRecord]
+    @ObservedObject private var detailRecordVM: DetailRecordViewModel
 
-    var firstParkingRecord: ParkingRecord? {
-        parkingRecords.first
-    }
-
-    @Query var parkingRecordss: [ParkingRecord]
-    @Environment(\.modelContext) var context
-    
-    func complete() {
-        firstParkingRecord?.isHistory.toggle()
-        firstParkingRecord?.completedAt = Date.now
-        try? context.save()
-        print("Complete")
+    init(detailRecordVM: DetailRecordViewModel) {
+        self.detailRecordVM = detailRecordVM
     }
     
     var body: some View {
         VStack(alignment: .leading) {
             Section {
-//                Text(String(describing: parkingRecordss))
-                
-                if let record = firstParkingRecord {
+                if detailRecordVM.activeParkingRecord != nil {
                     DetailRecordActive(
-                        isPreviewOpen: $isPreviewOpen,
-                        isCompassOpen: $isCompassOpen,
-                        selectedImageIndex: $selectedImageIndex,
-                        dateTime: record.createdAt,
-                        parkingRecord: record,
-                        isComplete: $isComplete
-                        
+//                        isPreviewOpen: $detailRecordVM.isPreviewOpen,
+//                        isCompassOpen: $detailRecordVM.isCompassOpen,
+//                        selectedImageIndex: $detailRecordVM.selectedImageIndex,
+//                        dateTime: detailRecordVM.activeParkingRecord.createdAt,
+//                        parkingRecord: detailRecordVM.activeParkingRecord,
+//                        isComplete: $detailRecordVM.isComplete,
+                        detailRecordVM: detailRecordVM   
                     )
                 } else {
                     DetailRecordInactive()
@@ -57,7 +40,7 @@ struct DetailRecord: View {
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                     
-                    if let _ = firstParkingRecord {
+                    if let _ = detailRecordVM.activeParkingRecord {
                         Text("Details of your parking activity")
                             .font(.subheadline)
                             .fontWeight(.medium)
@@ -73,28 +56,31 @@ struct DetailRecord: View {
                 .padding(.vertical)
             }
             .alertComponent(
-                isPresented: $isComplete,
+                isPresented: $detailRecordVM.isComplete,
                 title: "Complete this record?",
                 message: "This action will move the record to history and cannot be undone.",
-                confirmAction: complete,
+                confirmAction: detailRecordVM.complete,
                 confirmButtonText: "Complete",
                 confirmButtonRole: .destructive
             )
-            .fullScreenCover(isPresented: $isPreviewOpen) {
-                if let image = firstParkingRecord?.images[selectedImageIndex].getImage() {
-                    ImagePreviewView(imageName: image, isPresented: $isPreviewOpen)
+            .fullScreenCover(isPresented: $detailRecordVM.isPreviewOpen) {
+                if let image = detailRecordVM.activeParkingRecord?.images[detailRecordVM.selectedImageIndex].getImage() {
+                    ImagePreviewView(imageName: image, isPresented: $detailRecordVM.isPreviewOpen)
                 }
             }
-            .fullScreenCover(isPresented: $isCompassOpen) {
+            .fullScreenCover(isPresented: $detailRecordVM.isCompassOpen) {
 
-                if let record = firstParkingRecord {
+                if let record = detailRecordVM.activeParkingRecord {
                     CompassView(
-                        isCompassOpen: $isCompassOpen,
+                        isCompassOpen: $detailRecordVM.isCompassOpen,
                         selectedLocation: 6,
                         longitude: record.longitude,
                         latitude: record.latitude
                     )
                 }
+            }
+            .onAppear() {
+                detailRecordVM.synchronize()
             }
         }
     }

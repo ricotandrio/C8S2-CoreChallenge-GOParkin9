@@ -22,7 +22,8 @@ protocol ParkingRecordRepositoryProtocol {
         isPinned: Bool,
         isHistory: Bool,
         images: [ParkingImage],
-        floor: String
+        floor: String,
+        completedAt: Date
     )
     func delete(_ parkingRecord: ParkingRecord)
     func getActiveParkingRecord() -> ParkingRecord?
