@@ -63,7 +63,6 @@ class HistoryViewModel: ObservableObject {
     func automaticDeleteHistoryAfter(_ daysBeforeAutomaticDelete: Int) {
         let expirationDate = Calendar.current.date(byAdding: .day, value: -daysBeforeAutomaticDelete, to: Date()) ?? Date()
         
-        parkingRecordRepository.deleteExpiredHistories(expirationDate: expirationDate)
         switch GOParkin9App.parkingRecordRepository.deleteExpiredHistories(expirationDate: expirationDate) {
         case .success():
             // Successfully deleted expired histories
@@ -84,15 +83,21 @@ class HistoryViewModel: ObservableObject {
     
     // This function belongs to button for delete the selected history only if the selection is active
     func deleteSelection() {
-        let allParkingRecords = parkingRecordRepository.getAllHistories()
+        let result = GOParkin9App.parkingRecordRepository.getAllHistories()
         
-        self.selectedParkingRecords.forEach { id in
-            if let entry = allParkingRecords.first(where: { $0.id == id }) {
-                deleteItem(entry)
+        switch result {
+        case .success(let parkingRecords):
+            for id in selectedParkingRecords {
+                if let entry = parkingRecords.first(where: { $0.id == id }) {
+                    _ = GOParkin9App.parkingRecordRepository.delete(entry)
+                }
             }
+            selectedParkingRecords.removeAll()
+            isSelecting.toggle()
+            
+        case .failure(let error):
+            print("Error fetching parking records: \(error)")
         }
-        self.selectedParkingRecords.removeAll()
-        self.isSelecting.toggle()
     }
     
     // This function belongs to button for check the selected history
@@ -108,17 +113,23 @@ class HistoryViewModel: ObservableObject {
 
     // This function belongs to pin button that can be accessed by swipe history
     func pinItem(_ entry: ParkingRecord) {
-        withAnimation {
-            parkingRecordRepository.update(
-                parkingRecord: entry,
-                latitude: entry.latitude,
-                longitude: entry.longitude,
-                isPinned: entry.isPinned ? false : true,
-                isHistory: entry.isHistory,
-                images: entry.images,
-                floor: entry.floor,
-                completedAt: entry.completedAt
-            )
+        
+        switch GOParkin9App.parkingRecordRepository.update(
+            parkingRecord: entry,
+            latitude: entry.latitude,
+            longitude: entry.longitude,
+            isPinned: entry.isPinned ? false : true,
+            isHistory: entry.isHistory,
+            images: entry.images,
+            floor: entry.floor,
+            completedAt: entry.completedAt
+        ) {
+        case .success(let updatedEntry):
+            
+            print("Parking record updated successfully: \(updatedEntry)")
+        case .failure(let error):
+            
+            print("Error updating parking record: \(error)")
         }
         
         self.synchronize()
@@ -126,8 +137,11 @@ class HistoryViewModel: ObservableObject {
     
     // This function belongs to delete button that can be accessed by swipe history
     func deleteItem(_ entry: ParkingRecord) {
-        withAnimation {
-            parkingRecordRepository.delete(entry)
+        switch GOParkin9App.parkingRecordRepository.delete(entry) {
+        case .success():
+            print("Parking record deleted successfully.")
+        case .failure(let error):
+            print("Error deleting parking record: \(error)")
         }
         
         self.synchronize()

@@ -16,9 +16,7 @@ struct GOParkin9App: App {
     
     static let parkingRecordRepository: ParkingRecordRepositoryProtocol = ParkingRecordRepository()
     
-    init() {
-        GOParkin9App.parkingRecordRepository.setContext(userStartVM.sharedModelContainer)
-    }
+    init() { }
     
     var body: some Scene {
         WindowGroup {
@@ -33,6 +31,9 @@ struct GOParkin9App: App {
                     .modelContainer(userStartVM.sharedModelContainer)
                     .fullScreenCover(isPresented: $userSettingsVM.isFirstLaunch) {
                         WelcomeScreenView()
+                    }
+                    .onAppear() {
+                        GOParkin9App.parkingRecordRepository.setContext(userStartVM.sharedModelContainer.mainContext)
                     }
             }
         }

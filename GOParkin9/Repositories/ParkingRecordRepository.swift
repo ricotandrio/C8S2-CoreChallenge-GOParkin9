@@ -12,7 +12,7 @@ import SwiftData
 final class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
     static let shared = ParkingRecordRepository()
     
-    private var context: ModelContext?
+    var context: ModelContext?
     
     init() { }
     
@@ -103,8 +103,16 @@ final class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
             }
         )
         
+        if fetchDescriptor.predicate == nil {
+            return .failure(.invalidData)
+        }
+        
         do {
             let parkingRecords = try context.fetch(fetchDescriptor)
+            
+            if parkingRecords.isEmpty {
+                return .success(nil)
+            }
             
             return .success(parkingRecords.first)
         } catch {
@@ -112,6 +120,7 @@ final class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
             return .failure(.queryFailed)
         }
     }
+    
     
     func getAllHistories() -> Result<[ParkingRecord], RepositoryError> {
         guard let context = context else { return .failure(.contextNotFound) }
@@ -121,15 +130,23 @@ final class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
                 p.isHistory == true
             }
         )
-        
         do {
-            let parkingRecords = try context.fetch(fetchDescriptor)
+    
+            let parkRecord = try context.fetch(fetchDescriptor)
             
-            return .success(parkingRecords)
+            return .success(parkRecord)
         } catch {
             print("Error fetching parking records: \(error)")
             return .failure(.queryFailed)
         }
+//        do {
+//            let parkingRecords = try context.fetch(fetchDescriptor)
+//            
+//            return .success(parkingRecords)
+//        } catch {
+//            print("Error fetching parking records: \(error)")
+//            return .failure(.queryFailed)
+//        }
     }
     
     func deleteExpiredHistories(expirationDate: Date) -> Result<Void, RepositoryError> {
