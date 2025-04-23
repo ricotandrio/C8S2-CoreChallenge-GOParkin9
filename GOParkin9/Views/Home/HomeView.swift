@@ -18,9 +18,7 @@ struct HomeView: View {
                     NavigationList()
 
                     DetailRecord(
-                        detailRecordVM: DetailRecordViewModel(
-                            parkingRecordRepository: ParkingRecordRepository(context: context)
-                        )
+                        detailRecordVM: DetailRecordViewModel()
                     )
                 }
                 .navigationTitle("GOParkin9")

@@ -14,6 +14,12 @@ struct GOParkin9App: App {
     @StateObject private var userStartVM: UserStartViewModel = UserStartViewModel()
     @StateObject private var userSettingsVM: UserSettingsViewModel = UserSettingsViewModel()
     
+    static let parkingRecordRepository: ParkingRecordRepositoryProtocol = ParkingRecordRepository()
+    
+    init() {
+        GOParkin9App.parkingRecordRepository.setContext(userStartVM.sharedModelContainer)
+    }
+    
     var body: some Scene {
         WindowGroup {
             if userStartVM.isSplashActive {
@@ -22,6 +28,7 @@ struct GOParkin9App: App {
                         userStartVM.startSplashTimer()
                     }
             } else {
+                
                 ContentView()
                     .modelContainer(userStartVM.sharedModelContainer)
                     .fullScreenCover(isPresented: $userSettingsVM.isFirstLaunch) {

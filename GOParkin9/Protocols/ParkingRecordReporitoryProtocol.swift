@@ -8,13 +8,17 @@
 import Foundation
 
 protocol ParkingRecordRepositoryProtocol {
+    
+    func setContext(_ context: ModelContext)
+    
     func create(
         latitude: Double,
         longitude: Double,
         isHistory: Bool,
         floor: String,
         images: [ParkingImage]
-    ) -> ParkingRecord
+    ) -> Result<ParkingRecord, RepositoryError>
+    
     func update(
         parkingRecord: ParkingRecord,
         latitude: Double,
@@ -24,9 +28,13 @@ protocol ParkingRecordRepositoryProtocol {
         images: [ParkingImage],
         floor: String,
         completedAt: Date
-    )
-    func delete(_ parkingRecord: ParkingRecord)
-    func getActiveParkingRecord() -> ParkingRecord?
-    func getAllHistories() -> [ParkingRecord]
-    func deleteExpiredHistories(expirationDate: Date) 
+    ) -> Result<ParkingRecord, RepositoryError>
+    
+    func delete(_ parkingRecord: ParkingRecord) -> Result<Void, RepositoryError>
+    
+    func getActiveParkingRecord() -> Result<ParkingRecord?, RepositoryError>
+    
+    func getAllHistories() -> Result<[ParkingRecord], RepositoryError>
+    
+    func deleteExpiredHistories(expirationDate: Date) -> Result<Void, RepositoryError>
 }

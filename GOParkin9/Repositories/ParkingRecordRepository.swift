@@ -9,11 +9,14 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
+final class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
+    static let shared = ParkingRecordRepository()
     
-    private let context: ModelContext
+    private var context: ModelContext?
     
-    init(context: ModelContext) {
+    init() { }
+    
+    func setContext(_ context: ModelContext) {
         self.context = context
     }
     
@@ -23,7 +26,9 @@ class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
         isHistory: Bool,
         floor: String,
         images: [ParkingImage]
-    ) -> ParkingRecord {
+    ) -> Result<ParkingRecord, RepositoryError> {
+        guard let context = context else { return .failure(.contextNotFound) }
+        
         let parkingRecord = ParkingRecord(
             latitude: latitude,
             longitude: longitude,
@@ -34,11 +39,13 @@ class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
         do {
             context.insert(parkingRecord)
             try context.save()
+            
+            return .success(parkingRecord)
         } catch {
+            
             print("Error creating parking record: \(error)")
+            return .failure(.createFailed)
         }
-        
-        return parkingRecord
     }
     
     func update(
@@ -50,7 +57,9 @@ class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
         images: [ParkingImage],
         floor: String,
         completedAt: Date
-    ) {
+    ) -> Result<ParkingRecord, RepositoryError> {
+        guard let context = context else { return .failure(.contextNotFound) }
+        
         do {
             parkingRecord.latitude = latitude
             parkingRecord.longitude = longitude
@@ -61,22 +70,33 @@ class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
             parkingRecord.completedAt = completedAt
             
             try context.save()
+            return .success(parkingRecord)
         } catch {
+            
             print("Error updating parking record: \(error)")
+            return .failure(.updateFailed)
         }
     }
     
-    func delete(_ parkingRecord: ParkingRecord) {
+    func delete(_ parkingRecord: ParkingRecord) -> Result<Void, RepositoryError> {
+        guard let context = context else { return .failure(.contextNotFound) }
+        
         do {
             context.delete(parkingRecord)
             try context.save()
+            
+            return .success(())
         } catch {
+            
             print("Error deleting parking record: \(error)")
+            return .failure(.deleteFailed)
         }
     }
         
     
-    func getActiveParkingRecord() -> ParkingRecord? {
+    func getActiveParkingRecord() -> Result<ParkingRecord?, RepositoryError> {
+        guard let context = context else { return .failure(.contextNotFound) }
+        
         let fetchDescriptor = FetchDescriptor<ParkingRecord>(
             predicate: #Predicate<ParkingRecord> { p in
                 p.isHistory == false
@@ -86,14 +106,16 @@ class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
         do {
             let parkingRecords = try context.fetch(fetchDescriptor)
             
-            return parkingRecords.isEmpty ? nil : parkingRecords.first
+            return .success(parkingRecords.first)
         } catch {
-            print("Error fetching parking records: \(error)")
-            return nil
+            print("Error query parking records: \(error)")
+            return .failure(.queryFailed)
         }
     }
     
-    func getAllHistories() -> [ParkingRecord] {
+    func getAllHistories() -> Result<[ParkingRecord], RepositoryError> {
+        guard let context = context else { return .failure(.contextNotFound) }
+        
         let fetchDescriptor = FetchDescriptor<ParkingRecord>(
             predicate: #Predicate<ParkingRecord> { p in
                 p.isHistory == true
@@ -103,21 +125,38 @@ class ParkingRecordRepository: ParkingRecordRepositoryProtocol {
         do {
             let parkingRecords = try context.fetch(fetchDescriptor)
             
-            return parkingRecords
+            return .success(parkingRecords)
         } catch {
             print("Error fetching parking records: \(error)")
-            return []
+            return .failure(.queryFailed)
         }
     }
     
-    func deleteExpiredHistories(expirationDate: Date) {
-        for entry in self.getAllHistories() {
+    func deleteExpiredHistories(expirationDate: Date) -> Result<Void, RepositoryError> {
+        guard let context = context else { return .failure(.contextNotFound) }
+        
+        var allHistories: [ParkingRecord] = []
+        
+        switch self.getAllHistories() {
+            case .success(let histories):
+                allHistories = histories
+            case .failure(let error):
+                print("Error fetching all histories: \(error)")
+                return .failure(.queryFailed) 
+        }
+        
+        for entry in allHistories {
             if entry.createdAt < expirationDate && !entry.isPinned {
-                context.delete(entry)
+                do {
+                    context.delete(entry)
+                    try context.save()
+                } catch {
+                    print("Error deleting expired history: \(error)")
+                    return .failure(.deleteFailed)
+                }
             }
         }
-
-        try? context.save()
         
+        return .success(())
     }
 }

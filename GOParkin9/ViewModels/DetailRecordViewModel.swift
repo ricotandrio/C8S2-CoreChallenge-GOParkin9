@@ -16,11 +16,7 @@ class DetailRecordViewModel: ObservableObject {
     
     @Published var activeParkingRecord: ParkingRecord?
     
-    private var parkingRecordRepository: ParkingRecordRepositoryProtocol
-    
-    init(parkingRecordRepository: ParkingRecordRepositoryProtocol) {
-        self.parkingRecordRepository = parkingRecordRepository
-        
+    init() {
         self.activeParkingRecord = parkingRecordRepository.getActiveParkingRecord()
     }
     

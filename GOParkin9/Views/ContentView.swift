@@ -19,9 +19,7 @@ struct ContentView: View {
                    }
 
                 HistoryView(
-                    historyVM: HistoryViewModel(
-                        parkingRecordRepository: ParkingRecordRepository(context: context)
-                    )
+                    historyVM: HistoryViewModel()
                 )
                    .tabItem {
                        Label("History", systemImage: "clock")

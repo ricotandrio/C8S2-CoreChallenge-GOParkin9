@@ -11,8 +11,6 @@ import CoreLocation
 import SwiftData
 
 class HistoryViewModel: ObservableObject {
-    private var parkingRecordRepository: ParkingRecordRepositoryProtocol
-
     // This variable belongs to sort the history feature
     @Published var isDescending: Bool = true
     
@@ -32,14 +30,22 @@ class HistoryViewModel: ObservableObject {
     // This variable used to fetch all history data
     @Published var histories: [ParkingRecord] = []
     
-    init(parkingRecordRepository: ParkingRecordRepositoryProtocol) {
-        self.parkingRecordRepository = parkingRecordRepository
-        
-        self.histories = parkingRecordRepository.getAllHistories()   
+    @Published var errorMessage: String?
+    
+    init() {
+        self.synchronize()
     }
     
     func synchronize() {
-        self.histories = parkingRecordRepository.getAllHistories()
+        // Call the getAllHistories method from the singleton repository
+        switch GOParkin9App.parkingRecordRepository.getAllHistories() {
+        case .success(let parkingRecords):
+            // Successfully fetched parking records, update the histories
+            self.histories = parkingRecords
+        case .failure(let error):
+            // Handle failure case and show an error message
+            self.errorMessage = "Error fetching parking records: \(error)"
+        }
     }
     
     func getAllPinnedHistories() -> [ParkingRecord] {
@@ -58,6 +64,14 @@ class HistoryViewModel: ObservableObject {
         let expirationDate = Calendar.current.date(byAdding: .day, value: -daysBeforeAutomaticDelete, to: Date()) ?? Date()
         
         parkingRecordRepository.deleteExpiredHistories(expirationDate: expirationDate)
+        switch GOParkin9App.parkingRecordRepository.deleteExpiredHistories(expirationDate: expirationDate) {
+        case .success():
+            // Successfully deleted expired histories
+            print("Expired histories deleted successfully.")
+        case .failure(let error):
+            // Handle failure case and show an error message
+            print("Error deleting expired histories: \(error)")
+        }
         
         self.synchronize()
     }
