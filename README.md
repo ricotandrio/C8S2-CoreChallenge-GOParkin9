@@ -24,6 +24,14 @@ An iOS app that stores the user's vehicle photo and exact location. The app uses
 
 🎙 Voice Navigation -	Provides directions through voice output (AVFoundation)
 
+<img width="303" alt="Screenshot 2025-07-01 at 13 35 01" src="https://github.com/user-attachments/assets/79d505a7-a000-4e3a-aaef-e572e6adf561" />
+
+<img width="299" alt="Screenshot 2025-07-01 at 13 35 40" src="https://github.com/user-attachments/assets/ce1fe582-322c-4e9d-954c-a6ec78a1d9a9" />
+
+<img width="294" alt="Screenshot 2025-07-01 at 13 37 28" src="https://github.com/user-attachments/assets/32a00ac4-51e6-4fcb-8273-d6b1255af962" />
+
+
+
 ---
 
 🛠 **Tech Stack**
@@ -44,11 +52,15 @@ AVFoundation – Camera and speech synthesis
 
 🎯 User Story & Flow: focused on simplicity for first-time users
 
-🧪 Conducted user & concept testing with mentors
+🧪 Conducted user & concept testing with users and mentors
 
 🧠 Iterated design based on feedback
 
-🔗 Figma Lo-Fi Design
+![C8S2-Core Challenge-Team 9 - Concept Testing Result](https://github.com/user-attachments/assets/20da5ec7-aac6-4255-8214-75f6b76ecfe8)
+![C8S2-Core Challenge-Team 9 - Concept Testing Result-2](https://github.com/user-attachments/assets/4f85e20c-c663-4f16-8533-1b529cbe5f5e)
+
+
+🔗 https://www.figma.com/design/YEO1kAYkfZBmonFLhAuQSa/Lo-Fi?node-id=0-1&t=IIkS4MnEMEOlkdLa-1
 
 ---
 
