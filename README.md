@@ -16,13 +16,13 @@ An iOS app that stores the user's vehicle photo and exact location. The app uses
 
 🧩 **Key Features**
 
-📸 Save Car Location -	Capture a photo and save location with longitude & latitude
+📸 Save Vehicle Location -	Capture a photo and save location with longitude & latitude
 
 📍 Location Pinning -	Uses CoreLocation to detect current and destination position
 
-📲 View & Manage History -	Users can view, edit, and delete saved parking spots
+📲 View History -	Users can view and delete saved parking spots
 
-🎙 Voice Navigation -	Provides directions through voice output (AVFoundation)
+🎙 Voice Navigation -	Provides directions through voice output
 
 <img width="303" alt="Screenshot 2025-07-01 at 13 35 01" src="https://github.com/user-attachments/assets/79d505a7-a000-4e3a-aaef-e572e6adf561" />
 
